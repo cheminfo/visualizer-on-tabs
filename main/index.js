@@ -6,7 +6,7 @@ const WebpackOnBuildPlugin = require('on-build-webpack');
 
 
 module.exports = function (options) {
-    const outDir = path.resolve(__dirname, '../out');
+    const outDir = path.resolve(__dirname, options.outDir || '../out');
     options = options || {};
 
     var conf = options.config || {};
