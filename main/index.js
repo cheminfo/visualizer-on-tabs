@@ -9,7 +9,17 @@ module.exports = function (options) {
     const outDir = path.resolve(__dirname, '../out');
     options = options || {};
 
-    return Promise.all([buildApp(), copyContent()]);
+    var conf = options.config || {};
+    var confPath = path.join(__dirname, '../src/config.json');
+    return fs.writeFile(confPath, JSON.stringify(conf))
+        .then(function () {
+        return Promise.all([buildApp(), copyContent()]);
+    })
+        .then(function () {
+            return fs.unlink(confPath);
+        });
+
+
 
     function buildApp () {
         const entries = [
@@ -45,6 +55,7 @@ module.exports = function (options) {
                         },
                         {
                             test: /\.json$/,
+                            include: [path.resolve(__dirname, '../src')],
                             loader: 'json'
                         }
                     ]
@@ -64,7 +75,7 @@ module.exports = function (options) {
                     throw err;
                 } else if (jsonStats.errors.length > 0) {
                     printErrors(jsonStats.errors);
-                    if (!watch) {
+                    if (!options.watch) {
                         throw Error('Could not build ' + entry.file);
                     }
                 } else if (jsonStats.warnings.length > 0) {

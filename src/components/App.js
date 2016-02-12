@@ -17,12 +17,12 @@ import iframeMessageHandler from '../main/iframeMessageHandler';
 import iframeBridge from '../main/iframe-bridge';
 import tabStorage from '../main/tabStorage';
 
+var conf = require('../config.json');
 
-const possibleViews = {
-    Edition: {
-        url: 'http://localhost/localcouch/myviews/75b1a26b6468baaf6ac5d06c89f031b0/view.json'
-    }
-};
+console.log(conf);
+
+
+const possibleViews = conf;
 const forbiddenPossibleViews = Object.keys(possibleViews);
 
 let tabInit = Promise.resolve();
