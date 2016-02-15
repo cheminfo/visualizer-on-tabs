@@ -19,8 +19,6 @@ import tabStorage from '../main/tabStorage';
 
 var conf = require('../config.json');
 
-console.log(conf);
-
 
 const possibleViews = conf;
 const forbiddenPossibleViews = Object.keys(possibleViews);
@@ -54,7 +52,9 @@ class App extends React.Component {
             activeTabKey: 0
         };
 
-        this.openView('Edition');
+        for(var key in possibleViews) {
+            this.openView(key);
+        }
 
         this.loadTabs();
     }
