@@ -4,7 +4,6 @@ export function getConfig() {
 }
 
 let userConfig = {
-    lockView: true,
     debugLevel: 0,
     filters: [],
     modules: {
