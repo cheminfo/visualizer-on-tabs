@@ -19,7 +19,8 @@ if(argv.config) {
 
 build(options).then(function () {
     console.log('Build succeeded');
-}).catch(function () {
+}).catch(function (e) {
+    console.log(e.message, e.stack);
     console.error('Build failed');
 });
 

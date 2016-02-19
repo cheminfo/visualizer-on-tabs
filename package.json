@@ -16,6 +16,7 @@
     "babel-preset-react": "^6.1.18",
     "bootstrap": "^3.3.5",
     "flux": "^2.0.3",
+    "fs-extra": "^0.26.5",
     "fs-promise": "^0.4.1",
     "iframe-bridge": "cheminfo-js/iframe-bridge#83745e2764d925681c9969fcaf9b91d9aa29e955",
     "json-loader": "^0.5.3",
