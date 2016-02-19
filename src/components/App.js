@@ -12,15 +12,14 @@ import Tabs from '../main/Tabs';
 import TabTitle from './TabTitle';
 
 // Other
-import {getConfig} from '../main/visualizerConfig';
 import iframeMessageHandler from '../main/iframeMessageHandler';
 import iframeBridge from '../main/iframe-bridge';
 import tabStorage from '../main/tabStorage';
 
-var conf = require('../config.json');
+var conf = require('../config/config.js');
 
 
-const possibleViews = conf;
+const possibleViews = conf.possibleViews;
 const forbiddenPossibleViews = Object.keys(possibleViews);
 
 let tabInit = Promise.resolve();
@@ -78,7 +77,7 @@ class App extends React.Component {
                 }
             }
             possibleViews[obj.id] = {
-                url: obj.url.startsWith('http') ? obj.url : COUCH_URL + obj.url,
+                url: obj.url,
                 data: obj.data,
                 closable: obj.closable
             };
@@ -174,7 +173,7 @@ class App extends React.Component {
                         cdn="http://www.lactame.com/visualizer"
                         viewURL={view.url}
                         version="auto"
-                        config={getConfig()}
+                        config={conf.visualizerConfig}
                         scripts={[iframeBridge]}
                         style={{position:'static', flex: 2, border: 'none'}}
                     />

@@ -22,6 +22,7 @@
     "keymirror": "^0.1.1",
     "lockr": "^0.8.2",
     "lodash": "^3.10.1",
+    "minimist": "^1.2.0",
     "on-build-webpack": "^0.1.0",
     "react": "^0.14.2",
     "react-bootstrap": "^0.27.3",

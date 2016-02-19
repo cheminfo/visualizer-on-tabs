@@ -6,17 +6,17 @@ const WebpackOnBuildPlugin = require('on-build-webpack');
 
 
 module.exports = function (options) {
-    const outDir = path.resolve(__dirname, options.outDir || '../out');
+    const outDir = path.resolve(__dirname, '..', options.outDir || 'out');
     options = options || {};
 
     var conf = options.config || {};
-    var confPath = path.join(__dirname, '../src/config.json');
+    var confPath = path.join(__dirname, '../src/config/custom.json');
     return fs.writeFile(confPath, JSON.stringify(conf))
         .then(function () {
         return Promise.all([buildApp(), copyContent()]);
     })
         .then(function () {
-            return fs.unlink(confPath);
+            //return fs.unlink(confPath);
         });
 
 
