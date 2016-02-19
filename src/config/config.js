@@ -6,7 +6,6 @@ const customConfig = getCustomConfig();
 function getCustomConfig() {
     try {
         var custom = require('./custom.json');
-        console.log(custom);
         return custom;
     } catch(e) {
         return {};
