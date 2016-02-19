@@ -71,6 +71,12 @@ class App extends React.Component {
 
     doTab(obj) {
         if (!possibleViews[obj.id]) {
+            if(conf.rewriteRules) {
+                for(let i=0; i<config.rewriteRules.length; i++) {
+                    var rewriteRule = config.rewriteRules[i];
+                    obj.url = obj.url.replace(new RegExp(rewriteRule.reg), rewriteRule.replace);
+                }
+            }
             possibleViews[obj.id] = {
                 url: obj.url.startsWith('http') ? obj.url : COUCH_URL + obj.url,
                 data: obj.data,
