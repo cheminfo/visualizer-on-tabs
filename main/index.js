@@ -16,7 +16,7 @@ module.exports = function (options) {
         return Promise.all([buildApp(), copyContent()]);
     })
         .then(function () {
-            //return fs.unlink(confPath);
+            return fs.unlink(confPath);
         });
 
 
