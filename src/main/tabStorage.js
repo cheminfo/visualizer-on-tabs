@@ -16,7 +16,7 @@ storage.save = function (tabId, data) {
 
 storage.load = function () {
     var ids = lockr.smembers(LOCAL_STORAGE_TAB_IDS);
-    if (!ids) return;
+    if (!ids) return [];
 
     var data = lockr.getAll().filter(val => {
         if (!val || !val.id) return false;
