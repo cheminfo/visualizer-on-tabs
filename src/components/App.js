@@ -72,12 +72,6 @@ class App extends React.Component {
 
     doTab(obj) {
         if (!possibleViews[obj.id]) {
-            if(conf.rewriteRules) {
-                for(let i=0; i<conf.rewriteRules.length; i++) {
-                    var rewriteRule = conf.rewriteRules[i];
-                    obj.url = obj.url.replace(new RegExp(rewriteRule.reg), rewriteRule.replace);
-                }
-            }
             possibleViews[obj.id] = {
                 url: obj.url,
                 data: obj.data,
@@ -85,6 +79,13 @@ class App extends React.Component {
             };
         } else {
             possibleViews[obj.id].data = obj.data;
+        }
+
+        if(conf.rewriteRules) {
+            for(let i=0; i<conf.rewriteRules.length; i++) {
+                var rewriteRule = conf.rewriteRules[i];
+                possibleViews[obj.id]  = possibleViews[obj.id].url.replace(new RegExp(rewriteRule.reg), rewriteRule.replace);
+            }
         }
 
         this.openView(obj.id);
@@ -110,6 +111,7 @@ class App extends React.Component {
                     let view = {
                         id: id,
                         url: viewInfo.url,
+                        rewrittenUrl: viewInfo.rewrittenUrl,
                         closable: viewInfo.closable
                     };
                     this.state.viewsList.push(view);
@@ -173,7 +175,7 @@ class App extends React.Component {
                     key={view.id} eventKey={view.id}>
                     <Visualizer
                         cdn="https://www.lactame.com/visualizer"
-                        viewURL={view.url}
+                        viewURL={view.rewrittenUrl || view.url}
                         version="auto"
                         config={conf.visualizerConfig}
                         scripts={[iframeBridge]}
