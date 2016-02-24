@@ -7,11 +7,13 @@ import IframeBridge from 'iframe-bridge';
 import React from 'react';
 import Visualizer from 'react-visualizer';
 import {Tabs as BTabs, Tab, Button} from 'react-bootstrap';
+
 // Components
-import Tabs from '../main/Tabs';
 import TabTitle from './TabTitle';
+import Login from './Login';
 
 // Other
+import Tabs from '../main/Tabs';
 import iframeMessageHandler from '../main/iframeMessageHandler';
 import iframeBridge from '../main/iframe-bridge';
 import tabStorage from '../main/tabStorage';
@@ -183,11 +185,13 @@ class App extends React.Component {
 
         return (
             <div className="visualizer-on-tabs-app">
+                <Login></Login>
                 <div className="visualizer-on-tabs-content">
                     <BTabs style={{flex: 2, display:'flex', flexFlow: 'column'}} activeKey={this.state.activeTabKey}
                            onSelect={this.onActiveTab.bind(this)} animation={false}>
                         {arr}
                     </BTabs>
+
                 </div>
             </div>
         );

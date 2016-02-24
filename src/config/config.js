@@ -5,11 +5,15 @@ const customConfig = getCustomConfig();
 
 function getCustomConfig() {
     try {
-        var custom = require('./custom.json');
-        return custom;
+        return require('./custom.json');
     } catch(e) {
         return {};
     }
 }
 
-module.exports = Object.assign({}, defaultConfig, customConfig);
+var config = Object.assign({}, defaultConfig, customConfig);
+if(config.login && config.login.url) {
+    // Remove trailing slash
+    config.login.url = config.login.url.replace(/\/$/, '');
+}
+module.exports = config;
