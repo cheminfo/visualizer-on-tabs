@@ -19,7 +19,7 @@ storage.load = function () {
     if (!ids) return [];
 
     var data = ids.map(id => {
-        return Lockr.get(LOCAL_STORAGE_TAB_DATA + id);
+        return lockr.get(LOCAL_STORAGE_TAB_DATA + id);
     });
 
     data.sort(function (a, b) {
