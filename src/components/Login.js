@@ -19,7 +19,7 @@ class Login extends React.Component {
     }
 
     session() {
-        superagent.get(`${conf.login.url}/auth/session`)
+        superagent.get(`${conf.rocLogin.url}/auth/session`)
             .withCredentials()
             .end((err, res) => {
                 if (err) console.log('Could not get session', err);
@@ -36,7 +36,7 @@ class Login extends React.Component {
 
 
     logout() {
-        superagent.get(`${conf.login.url}/auth/logout`)
+        superagent.get(`${conf.rocLogin.url}/auth/logout`)
             .withCredentials()
             .end((err, res) => {
                 if (err) console.error('Could not logout', err);
@@ -47,12 +47,12 @@ class Login extends React.Component {
     }
 
     render() {
-        if (!conf.login) {
+        if (!conf.rocLogin) {
             return <div></div>
         }
         if (!this.state.user || this.state.user === 'anonymous') {
             return <div style={styles}><a
-                href={`${conf.login.url}/auth/login?continue=${conf.login.redirect}`}>Login</a></div>
+                href={`${conf.rocLogin.url}/auth/login?continue=${conf.rocLogin.redirect}`}>Login</a></div>
         } else {
             return <div style={styles}>{this.state.user} (<a href="#" onClick={this.logout.bind(this)}>Logout</a>)</div>
         }

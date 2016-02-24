@@ -12,8 +12,8 @@ function getCustomConfig() {
 }
 
 var config = Object.assign({}, defaultConfig, customConfig);
-if(config.login && config.login.url) {
+if(config.rocLogin && config.rocLogin.url) {
     // Remove trailing slash
-    config.login.url = config.login.url.replace(/\/$/, '');
+    config.rocLogin.url = config.rocLogin.url.replace(/\/$/, '');
 }
 module.exports = config;
