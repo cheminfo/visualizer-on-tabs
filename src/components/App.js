@@ -84,7 +84,7 @@ class App extends React.Component {
         if(conf.rewriteRules) {
             for(let i=0; i<conf.rewriteRules.length; i++) {
                 var rewriteRule = conf.rewriteRules[i];
-                possibleViews[obj.id]  = possibleViews[obj.id].url.replace(new RegExp(rewriteRule.reg), rewriteRule.replace);
+                possibleViews[obj.id].rewrittenUrl  = possibleViews[obj.id].url.replace(new RegExp(rewriteRule.reg), rewriteRule.replace);
             }
         }
 
