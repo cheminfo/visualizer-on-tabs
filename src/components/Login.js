@@ -19,6 +19,7 @@ class Login extends React.Component {
     }
 
     session() {
+        if(!conf.rocLogin) return;
         superagent.get(`${conf.rocLogin.url}/auth/session`)
             .withCredentials()
             .end((err, res) => {
@@ -36,6 +37,7 @@ class Login extends React.Component {
 
 
     logout() {
+        if(!conf.rocLogin) return;
         superagent.get(`${conf.rocLogin.url}/auth/logout`)
             .withCredentials()
             .end((err, res) => {
