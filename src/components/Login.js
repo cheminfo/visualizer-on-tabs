@@ -54,7 +54,7 @@ class Login extends React.Component {
         }
         if (!this.state.user || this.state.user === 'anonymous') {
             return <div style={styles}><a
-                href={`${conf.rocLogin.url}/auth/login?continue=${conf.rocLogin.redirect}`}>Login</a></div>
+                href={`${conf.rocLogin.url}/auth/login?continue=${conf.rocLogin.redirect || location.href}`}>Login</a></div>
         } else {
             return <div style={styles}>{this.state.user} (<a href="#" onClick={this.logout.bind(this)}>Logout</a>)</div>
         }
