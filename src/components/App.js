@@ -174,6 +174,7 @@ class App extends React.Component {
                     title={<TabTitle name={view.id} onTabClosed={closable ? this.removeTab.bind(this, view.id) : null} />}
                     key={view.id} eventKey={view.id}>
                     <Visualizer
+                        fallbackVersion={config.visualizerFallbackVersion || 'latest'}
                         cdn="https://www.lactame.com/visualizer"
                         viewURL={view.rewrittenUrl || view.url}
                         version="auto"
