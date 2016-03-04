@@ -15,6 +15,9 @@ class Login extends React.Component {
     constructor() {
         super();
         this.state = {};
+        if(!conf.rocLogin) return;
+
+        this.loginUrl = `${conf.rocLogin.url}/auth/login?continue=${conf.rocLogin.redirect || location.href}`;
         this.session();
     }
 
@@ -25,6 +28,9 @@ class Login extends React.Component {
             .end((err, res) => {
                 if (err) console.log('Could not get session', err);
                 else if (res && res.status == 200 && res.body) {
+                    if(!res.body.authenticated && conf.rocLogin.auto) {
+                        location.href = this.loginUrl;
+                    }
                     return this.setState({
                         user: res.body.username
                     });
@@ -54,7 +60,7 @@ class Login extends React.Component {
         }
         if (!this.state.user || this.state.user === 'anonymous') {
             return <div style={styles}><a
-                href={`${conf.rocLogin.url}/auth/login?continue=${conf.rocLogin.redirect || location.href}`}>Login</a></div>
+                href={this.loginUrl}>Login</a></div>
         } else {
             return <div style={styles}>{this.state.user} (<a href="#" onClick={this.logout.bind(this)}>Logout</a>)</div>
         }
