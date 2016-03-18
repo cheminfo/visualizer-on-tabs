@@ -18,7 +18,7 @@
     "flux": "^2.0.3",
     "fs-extra": "^0.26.5",
     "fs-promise": "^0.4.1",
-    "iframe-bridge": "cheminfo-js/iframe-bridge#83745e2764d925681c9969fcaf9b91d9aa29e955",
+    "iframe-bridge": "cheminfo-js/iframe-bridge#60a5f776fedafebf3c016534fe760070b9252c8f",
     "json-loader": "^0.5.3",
     "keymirror": "^0.1.1",
     "lockr": "^0.8.2",
