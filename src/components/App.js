@@ -54,7 +54,7 @@ class App extends React.Component {
             activeTabKey: 0
         };
 
-        for(var key in possibleViews) {
+        for (var key in possibleViews) {
             this.openView(key);
         }
 
@@ -72,17 +72,17 @@ class App extends React.Component {
     setTabStatus(data) {
         // Find view with given window ID
         var ids = Object.keys(possibleViews);
-        let id = ids.find(id => possibleViews[id].windowID = data.windowID);
-        if(!id) return;
+        let id = ids.find(id => possibleViews[id].windowID === data.windowID);
+        if (!id) return;
         let view = possibleViews[id];
 
         view = this.state.viewsList.find(el => el.id === view.id);
-        if(!view) return;
+        if (!view) return;
 
         view.status = Object.assign({}, view.status, data.message);
         this.setState({
             viewsList: this.state.viewsList
-        })
+        });
     }
 
     doTab(obj) {
@@ -96,10 +96,10 @@ class App extends React.Component {
             possibleViews[obj.id].data = obj.data;
         }
 
-        if(conf.rewriteRules) {
-            for(let i=0; i<conf.rewriteRules.length; i++) {
+        if (conf.rewriteRules) {
+            for (let i = 0; i < conf.rewriteRules.length; i++) {
                 var rewriteRule = conf.rewriteRules[i];
-                possibleViews[obj.id].rewrittenUrl  = possibleViews[obj.id].url.replace(new RegExp(rewriteRule.reg), rewriteRule.replace);
+                possibleViews[obj.id].rewrittenUrl = possibleViews[obj.id].url.replace(new RegExp(rewriteRule.reg), rewriteRule.replace);
             }
         }
 
@@ -188,7 +188,7 @@ class App extends React.Component {
             var saved = !view.status || view.status.saved === undefined ? true : view.status.saved;
 
             var textStyle = {};
-            if(!saved) {
+            if (!saved) {
                 textStyle.color = 'red';
             }
             arr.push(
