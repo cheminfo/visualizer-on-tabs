@@ -46,6 +46,7 @@ class App extends React.Component {
         });
 
         Tabs.on('openTab', this.doTab.bind(this));
+        Tabs.on('status', this.setTabStatus.bind(this));
 
 
         this.state = {
@@ -68,7 +69,21 @@ class App extends React.Component {
         }
     }
 
+    setTabStatus(data) {
+        // Find view with given window ID
+        var ids = Object.keys(possibleViews);
+        let id = ids.find(id => possibleViews[id].windowID = data.windowID);
+        if(!id) return;
+        let view = possibleViews[id];
 
+        view = this.state.viewsList.find(el => el.id === view.id);
+        if(!view) return;
+
+        view.status = Object.assign({}, view.status, data.message);
+        this.setState({
+            viewsList: this.state.viewsList
+        })
+    }
 
     doTab(obj) {
         if (!possibleViews[obj.id]) {
@@ -169,9 +184,16 @@ class App extends React.Component {
 
         for (let view of this.state.viewsList) {
             var closable = view.closable === undefined ? true : view.closable;
+            console.log(view.status);
+            var saved = !view.status || view.status.saved === undefined ? true : view.status.saved;
+
+            var textStyle = {};
+            if(!saved) {
+                textStyle.color = 'red';
+            }
             arr.push(
                 <Tab
-                    title={<TabTitle name={view.id} onTabClosed={closable ? this.removeTab.bind(this, view.id) : null} />}
+                    title={<TabTitle textTitle={saved ? null : 'Not saved'} textStyle={textStyle} name={view.id} onTabClosed={closable ? this.removeTab.bind(this, view.id) : null} />}
                     key={view.id} eventKey={view.id}>
                     <Visualizer
                         fallbackVersion={conf.visualizerFallbackVersion || 'latest'}
