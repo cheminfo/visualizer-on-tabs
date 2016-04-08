@@ -5,7 +5,6 @@ import {Glyphicon} from 'react-bootstrap';
 
 class TabTitle extends React.Component {
     render() {
-        console.log('render tab title', this.props)
         var closeHandle;
         if(this.props.onTabClosed) {
             closeHandle = <span>&nbsp;&nbsp;<Glyphicon className="close-tab-glyph" glyph="remove" onClick={this.onClosedClicked.bind(this)} /></span>
