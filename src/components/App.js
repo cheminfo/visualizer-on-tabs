@@ -174,6 +174,9 @@ class App extends React.Component {
 
 
     onActiveTab(key) {
+        if(key !== this.state.activeTabKey) {
+            IframeBridge.postMessage('tab.focus', {}, possibleViews[key].windowID);
+        }
         this.setState({
             activeTabKey: key
         });
