@@ -12,6 +12,7 @@ var build = require('..');
 var options = {};
 options.watch = argv.watch;
 options.outDir = argv.outDir;
+options.debug = argv.debug;
 
 if(argv.config) {
     options.config = JSON.parse(fs.readFileSync(path.resolve(path.join(__dirname, '..'), argv.config), 'utf-8'));

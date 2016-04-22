@@ -69,6 +69,12 @@ module.exports = function (options) {
                 watch: options.watch
             };
 
+            if(!options.debug) {
+                config.plugins.unshift(new webpack.DefinePlugin({
+                    'process.env.NODE_ENV': '"production"'
+                }));
+            }
+
             webpack(config, function (err, stats) {
                 var jsonStats = stats.toJson();
                 if (err) {

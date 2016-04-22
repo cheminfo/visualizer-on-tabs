@@ -5,7 +5,7 @@
   "scripts": {
     "clean": "rm -rf out",
     "copy-static": "mkdir -p out && cp -r src/content/* out",
-    "webpack": "node bin/build.js",
+    "webpack": "node bin/build.js --debug=1",
     "watch": "npm run copy-static && npm run webpack -- --watch",
     "build": "npm run clean && npm run webpack"
   },
