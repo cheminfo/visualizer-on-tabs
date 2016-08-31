@@ -28,13 +28,16 @@ Now you try it in: www.myserver.com/on-tabs/
 
 ### Configure a flavor to deploy on-tabs
 
-Edit the `flavorLayouts` to specify a deployment method for your flavor. For this, you need to add a new entry which key is your flavor name and value is `visualizer-on-tabs`. Example: 
+Edit the `flavorLayouts`(/usr/local/flavor-builder/config.json) to specify a deployment method for your flavor. For this, you need to add a new entry which key is your flavor name and value is `visualizer-on-tabs`. Example: 
 ```
 ...
-'sample':'visualizer-on-tabs'
-...
+"flavorLayouts": {
+    "720p": "minimal-simple-menu",
+    "myflavor":"visualizer-on-tabs"
+  }
+  ...
 ```
-Add a new rewriteRule in the flavor-builder config
+Add a new rewriteRule
 
 ```
 "visualizerOnTabs": {
