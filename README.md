@@ -25,3 +25,29 @@ node bin/build.js --outDir=/var/www/html/on-tabs/ --config=/usr/local/on-tabs-co
 ```
 
 Now you try it in: www.myserver.com/on-tabs/
+
+### Configure a flavor to deploy on-tabs
+
+Edit the `flavorLayouts` to specify a deployment method for your flavor. For this, you need to add a new entry which key is your flavor name and value is `visualizer-on-tabs`. Example: 
+```
+...
+'sample':'visualizer-on-tabs'
+...
+```
+Add a new rewriteRule in the flavor-builder config
+
+```
+"visualizerOnTabs": {
+    "_default": {
+      "rocLogin": {
+        "url": "https://myloginserver"
+      },
+      "rewriteRules": [
+        {"reg": "^[^/]+$", "replace": "http://myserver.org/rest-on-couch/db/visualizer/$&/view.json"}
+      ]
+    }
+    ...
+```
+You would need to edit a view in this flavor, or launch the build manually with the `--forceUpdate` option.
+
+
