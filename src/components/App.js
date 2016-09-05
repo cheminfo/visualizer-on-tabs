@@ -209,7 +209,7 @@ class App extends React.Component {
                         fallbackVersion={conf.visualizerFallbackVersion || 'latest'}
                         cdn="https://www.lactame.com/visualizer"
                         viewURL={view.rewrittenUrl || view.url}
-                        version="auto"
+                        version={conf.visualizerVersion || 'auto'}
                         config={conf.visualizerConfig}
                         scripts={[iframeBridge]}
                         style={{position:'static', flex: 2, border: 'none'}}
