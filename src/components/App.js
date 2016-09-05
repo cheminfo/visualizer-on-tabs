@@ -99,7 +99,15 @@ class App extends React.Component {
         if (conf.rewriteRules) {
             for (let i = 0; i < conf.rewriteRules.length; i++) {
                 var rewriteRule = conf.rewriteRules[i];
-                possibleViews[obj.id].rewrittenUrl = possibleViews[obj.id].url.replace(new RegExp(rewriteRule.reg), rewriteRule.replace);
+                let url = possibleViews[obj.id].url;
+                let reg = new RegExp(rewriteRule.reg);
+                if(url.match(reg)) {
+                    possibleViews[obj.id].rewrittenUrl = url.replace(reg, rewriteRule.replace);
+                    break;
+                }
+            }
+            if(!possibleViews[obj.id].rewrittenUrl) {
+                console.warn('No rewrite rule matched the url');
             }
         }
 
@@ -187,7 +195,6 @@ class App extends React.Component {
 
         for (let view of this.state.viewsList) {
             var closable = view.closable === undefined ? true : view.closable;
-            console.log(view.status);
             var saved = !view.status || view.status.saved === undefined ? true : view.status.saved;
 
             var textStyle = {};
