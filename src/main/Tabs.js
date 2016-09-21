@@ -12,4 +12,8 @@ Tabs.status = function(data) {
     Tabs.emit('status', data);
 };
 
+Tabs.sendMessage = function (message) {
+    Tabs.emit('message', message);
+};
+
 export default Tabs;

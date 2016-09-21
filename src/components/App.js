@@ -47,7 +47,7 @@ class App extends React.Component {
 
         Tabs.on('openTab', this.doTab.bind(this));
         Tabs.on('status', this.setTabStatus.bind(this));
-
+        Tabs.on('message', this.sendTabMessage.bind(this));
 
         this.state = {
             viewsList: [],
@@ -83,6 +83,13 @@ class App extends React.Component {
         this.setState({
             viewsList: this.state.viewsList
         });
+    }
+
+    sendTabMessage(data) {
+        const viewInfo = possibleViews[data.id];
+        if (viewInfo) {
+            IframeBridge.postMessage('tab.message', data.message, viewInfo.windowID);
+        }
     }
 
     doTab(obj) {

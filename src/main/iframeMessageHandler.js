@@ -13,6 +13,10 @@ export default function iframeMessageHandler(data, [level2]) {
             Tabs.status(data);
             prom = Promise.resolve('done');
             break;
+        case 'message':
+            Tabs.sendMessage(data.message);
+            prom = Promise.resolve('done');
+            break;
         default:
             prom = Promise.reject(`Unknown action: ${level2}}`);
             break;
