@@ -48,6 +48,7 @@ class App extends React.Component {
         Tabs.on('openTab', this.doTab.bind(this));
         Tabs.on('status', this.setTabStatus.bind(this));
         Tabs.on('message', this.sendTabMessage.bind(this));
+        Tabs.on('focus', this.focusTab.bind(this));
 
         this.state = {
             viewsList: [],
@@ -89,6 +90,14 @@ class App extends React.Component {
         const viewInfo = possibleViews[data.id];
         if (viewInfo) {
             IframeBridge.postMessage('tab.message', data.message, viewInfo.windowID);
+        }
+    }
+
+    focusTab(tabId) {
+        if (this.state.viewsList.find(el => el.id === tabId)) {
+            this.setState({
+                activeTabKey: tabId
+            });
         }
     }
 

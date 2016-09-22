@@ -16,4 +16,8 @@ Tabs.sendMessage = function (message) {
     Tabs.emit('message', message);
 };
 
+Tabs.focus = function (message) {
+    Tabs.emit('focus', message);
+};
+
 export default Tabs;
