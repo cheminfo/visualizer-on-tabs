@@ -15,6 +15,7 @@ module.exports = function (options) {
         .then(function () {
         return Promise.all([buildApp(), copyContent()]);
     })
+        .then(modifyIndex)
         .then(function () {
             return fs.unlink(confPath);
         });
@@ -97,6 +98,13 @@ module.exports = function (options) {
 
     function copyContent() {
         return fs.copy(path.join(__dirname, '../src/content'), outDir);
+    }
+
+    function modifyIndex() {
+        return fs.readFile(path.join(outDir, 'index.html'), 'utf8')
+            .then(function (content) {
+                return fs.writeFile(path.join(outDir, 'index.html'), content.replace('app.js', 'app.js?_=' + Date.now()));
+            });
     }
 
     function printErrors(errors) {
