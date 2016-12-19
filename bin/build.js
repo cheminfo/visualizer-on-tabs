@@ -11,9 +11,9 @@ const argv = require('minimist')(process.argv.slice(2));
 const build = require('..');
 
 const options = {};
-options.watch = argv.watch;
-options.outDir = argv.outDir;
-options.debug = argv.debug;
+if (argv.watch) options.watch = argv.watch;
+if (argv.outDir) options.outDir = argv.outDir;
+if (argv.debug) options.debug = argv.debug;
 
 if(argv.config) {
     const configFile = path.resolve(path.join(__dirname, '..'), argv.config);
