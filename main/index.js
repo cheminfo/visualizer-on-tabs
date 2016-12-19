@@ -6,13 +6,17 @@ const fs = require('fs-promise');
 const WebpackOnBuildPlugin = require('on-build-webpack');
 
 const defaultOptions = {
-    title: 'visualizer-on-tabs',
-    outDir: 'out',
-    config: {}
+    outDir: 'out'
 };
+
+const defaultConfig = {
+    title: 'visualizer-on-tabs'
+}
 
 module.exports = function (options) {
     options = Object.assign({}, defaultOptions, options);
+    options.config = Object.assign({}, defaultConfig, options.config);
+
     const outDir = path.resolve(__dirname, '..', options.outDir);
 
     const confPath = path.join(__dirname, '../src/config/custom.json');
@@ -108,7 +112,7 @@ module.exports = function (options) {
             .then(function (content) {
                 const tpl = _.template(content);
                 return fs.writeFile(path.join(outDir, 'index.html'), tpl({
-                    title: options.title,
+                    title: options.config.title,
                     uniqid: Date.now()
                 }));
             });
