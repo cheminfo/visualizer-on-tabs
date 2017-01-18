@@ -1792,9 +1792,9 @@ react-prop-types@^0.4.0:
   dependencies:
     warning "^3.0.0"
 
-react-visualizer@^1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/react-visualizer/-/react-visualizer-1.1.9.tgz#9103027662a630eae4b6f22ea814e34433a9ac48"
+react-visualizer@^1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/react-visualizer/-/react-visualizer-1.1.10.tgz#247cdbf6201c175d53cf20ced049073d9896e851"
 
 react@^15.4.2:
   version "15.4.2"
