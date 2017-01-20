@@ -56,7 +56,8 @@ class App extends React.Component {
         };
 
         for (var key in possibleViews) {
-            this.openView(key);
+            possibleViews[key].id = key;
+            this.doTab(possibleViews[key]);
         }
 
         this.loadTabs();
