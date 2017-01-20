@@ -1,31 +1,39 @@
 'use strict';
 const webpack = require('webpack');
+const _ = require('lodash');
 const path = require('path');
 const fs = require('fs-promise');
 const WebpackOnBuildPlugin = require('on-build-webpack');
 
+const defaultOptions = {
+    outDir: 'out'
+};
+
+const defaultConfig = {
+    title: 'visualizer-on-tabs'
+}
 
 module.exports = function (options) {
-    const outDir = path.resolve(__dirname, '..', options.outDir || 'out');
-    options = options || {};
+    options = Object.assign({}, defaultOptions, options);
+    options.config = Object.assign({}, defaultConfig, options.config);
 
-    var conf = options.config || {};
-    var confPath = path.join(__dirname, '../src/config/custom.json');
-    return fs.writeFile(confPath, JSON.stringify(conf))
+    const outDir = path.resolve(__dirname, '..', options.outDir);
+
+    const confPath = path.join(__dirname, '../src/config/custom.json');
+    return fs.writeFile(confPath, JSON.stringify(options.config))
         .then(function () {
         return Promise.all([buildApp(), copyContent()]);
     })
+        .then(() => addIndex(options))
         .then(function () {
             return fs.unlink(confPath);
         });
-
 
 
     function buildApp () {
         const entries = [
             {file: 'app.js'}
         ];
-
 
         let prom = [];
         for (let entry of entries) {
@@ -97,6 +105,17 @@ module.exports = function (options) {
 
     function copyContent() {
         return fs.copy(path.join(__dirname, '../src/content'), outDir);
+    }
+
+    function addIndex() {
+        return fs.readFile(path.join(__dirname, '../src/template/index.html'), 'utf8')
+            .then(function (content) {
+                const tpl = _.template(content);
+                return fs.writeFile(path.join(outDir, 'index.html'), tpl({
+                    title: options.config.title,
+                    uniqid: Date.now()
+                }));
+            });
     }
 
     function printErrors(errors) {

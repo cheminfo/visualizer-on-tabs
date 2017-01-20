@@ -4,18 +4,20 @@
 
 const path = require('path');
 const fs = require('fs');
+const yaml = require('js-yaml');
 
 const argv = require('minimist')(process.argv.slice(2));
 
-var build = require('..');
+const build = require('..');
 
-var options = {};
-options.watch = argv.watch;
-options.outDir = argv.outDir;
-options.debug = argv.debug;
+const options = {};
+if (argv.watch) options.watch = argv.watch;
+if (argv.outDir) options.outDir = argv.outDir;
+if (argv.debug) options.debug = argv.debug;
 
 if(argv.config) {
-    options.config = JSON.parse(fs.readFileSync(path.resolve(path.join(__dirname, '..'), argv.config), 'utf-8'));
+    const configFile = path.resolve(path.join(__dirname, '..'), argv.config);
+    options.config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'), {filename: configFile});
 }
 
 build(options).then(function () {
@@ -24,4 +26,3 @@ build(options).then(function () {
     console.log(e.message, e.stack);
     console.error('Build failed');
 });
-
