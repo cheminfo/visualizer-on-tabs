@@ -30,7 +30,7 @@ class Login extends React.Component {
         superagent.get(`${login.url}/auth/session`)
             .withCredentials()
             .end((err, res) => {
-                if (err) console.log('Could not get session', err);
+                if (err) console.error('Could not get session', err);
                 else if (res && res.status == 200 && res.body) {
                     if (login.auto && (!res.body.authenticated || (login.user && res.body.username !== login.user))) {
                         location.href = this.loginUrl;

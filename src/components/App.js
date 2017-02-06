@@ -123,9 +123,6 @@ class App extends React.Component {
                     break;
                 }
             }
-            if(!possibleViews[obj.id].rewrittenUrl) {
-                console.warn('No rewrite rule matched the url');
-            }
         }
 
         this.openView(obj.id);
@@ -145,7 +142,7 @@ class App extends React.Component {
             tabInit = tabInit.then(() => {
                 return new Promise(resolve => {
                     if (this.state.viewsList.find(el => el.id === id)) {
-                        console.warn('ignore open view...');
+                        // ignore open view
                         return resolve();
                     }
                     let view = {
