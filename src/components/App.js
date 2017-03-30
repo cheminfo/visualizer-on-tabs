@@ -27,6 +27,10 @@ const forbiddenPossibleViews = Object.keys(possibleViews);
 let tabInit = Promise.resolve();
 let currentIframe;
 
+function getParameterByName(name) {
+    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+}
 
 class App extends React.Component {
     constructor() {
@@ -49,6 +53,8 @@ class App extends React.Component {
         Tabs.on('status', this.setTabStatus.bind(this));
         Tabs.on('message', this.sendTabMessage.bind(this));
         Tabs.on('focus', this.focusTab.bind(this));
+
+        this.visualizerVersion = getParameterByName('v');
 
         this.state = {
             viewsList: [],
@@ -223,7 +229,7 @@ class App extends React.Component {
                         fallbackVersion={conf.visualizerFallbackVersion || 'latest'}
                         cdn="https://www.lactame.com/visualizer"
                         viewURL={view.rewrittenUrl || view.url}
-                        version={conf.visualizerVersion || 'auto'}
+                        version={this.visualizerVersion || conf.visualizerVersion || 'auto'}
                         config={conf.visualizerConfig}
                         scripts={[iframeBridge]}
                         style={{position:'static', flex: 2, border: 'none'}}
