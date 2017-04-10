@@ -45,6 +45,7 @@ class App extends React.Component {
                 if (possibleViews[currentIframe.id].data) {
                     IframeBridge.postMessage('tab.data', possibleViews[currentIframe.id].data, data.windowID);
                 }
+                this.sendTabFocusEvent(currentIframe.id, true);
                 tabStorage.save(currentIframe.id, possibleViews[currentIframe.id]);
             }
         });
@@ -102,6 +103,7 @@ class App extends React.Component {
 
     focusTab(tabId) {
         if (this.state.viewsList.find(el => el.id === tabId)) {
+            this.sendTabFocusEvent(tabId);
             this.setState({
                 activeTabKey: tabId
             });
@@ -194,17 +196,23 @@ class App extends React.Component {
             }
         }
 
+        this.sendTabFocusEvent(newActiveTab);
+
         this.setState({
             viewsList: this.state.viewsList,
             activeTabKey: newActiveTab
         });
     }
 
-
-    onActiveTab(key) {
-        if(key !== this.state.activeTabKey) {
+    sendTabFocusEvent(key, force) {
+        if(force || key !== this.state.activeTabKey) {
             IframeBridge.postMessage('tab.focus', {}, possibleViews[key].windowID);
         }
+    }
+
+    onActiveTab(key) {
+        this.sendTabFocusEvent(key);
+
         this.setState({
             activeTabKey: key
         });
