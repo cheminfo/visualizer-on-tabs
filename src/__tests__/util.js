@@ -1,14 +1,16 @@
 import {rewriteURL} from '../util';
 
 const devRules = [
-    {"reg": "^[^/?]+$", "replace": "https://mydb.cheminfo.org/db/visualizer/entry/$&/view.json"},
-    {"reg": "^[^/]+\/view.json$", "replace": "https://mydb.cheminfo.org/db/visualizer/entry/$&"}
+    {"reg": "^([a-z0-9]+)\\?.*", "replace": "https://mydb.cheminfo.org/db/visualizer/entry/$1/view.json"},
+    {"reg": "^([a-z0-9]+)\/view.json\\?.*", "replace": "https://mydb.cheminfo.org/db/visualizer/entry/$1/view.json"},
+    {"reg": "^[a-z0-9]+\/view.json$", "replace": "https://mydb.cheminfo.org/db/visualizer/entry/$&"},
+    {"reg": "^[a-z0-9]+$", "replace": "https://mydb.cheminfo.org/db/visualizer/entry/$&/view.json"}
 ];
 
 const prodRules = [
-    {"reg": "^([^/?]+)\\?(.*)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json?$2"},
-    {"reg": "^[^/]+$", "replace": "https://couch.cheminfo.org/cheminfo-public/$&/view.json"},
-    {"reg": "^[^/]+\/view.json.*", "replace": "https://couch.cheminfo.org/cheminfo-public/$&"}
+    {"reg": "^([a-z0-9]+)\\?(.*)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json?$2"},
+    {"reg": "^[a-z0-9]+$", "replace": "https://couch.cheminfo.org/cheminfo-public/$&/view.json"},
+    {"reg": "^[a-z0-9]+\/view.json\\?.*", "replace": "https://couch.cheminfo.org/cheminfo-public/$&"}
 ];
 
 describe('dev rewrite rules', function () {
@@ -17,16 +19,16 @@ describe('dev rewrite rules', function () {
         expect(rewriteURL(rules, '15c9a2dcd55c963fdedf2c18a1471b03')).toEqual('https://mydb.cheminfo.org/db/visualizer/entry/15c9a2dcd55c963fdedf2c18a1471b03/view.json');
     });
 
-    it('should not rewrite uuid with rev', function () {
-        expect(rewriteURL(rules, '15c9a2dcd55c963fdedf2c18a1471b03?referer=abc&rev=161-13da947c771e6847466bc8f0cd43f9ae')).toEqual(null);
+    it('should rewrite uuid with rev by ignoring rev', function () {
+        expect(rewriteURL(rules, '15c9a2dcd55c963fdedf2c18a1471b03?referer=abc&rev=161-13da947c771e6847466bc8f0cd43f9ae')).toEqual('https://mydb.cheminfo.org/db/visualizer/entry/15c9a2dcd55c963fdedf2c18a1471b03/view.json');
     });
 
     it('should rewrite uuid/view.json', function () {
         expect(rewriteURL(rules, '15c9a2dcd55c963fdedf2c18a1471b03/view.json')).toEqual('https://mydb.cheminfo.org/db/visualizer/entry/15c9a2dcd55c963fdedf2c18a1471b03/view.json');
     });
 
-    it('should not rewrite uuid/view.json with rev', function () {
-        expect(rewriteURL(rules, '15c9a2dcd55c963fdedf2c18a1471b03/view.json?referer=abc&rev=161-13da947c771e6847466bc8f0cd43f9ae')).toEqual(null);
+    it('should rewrite uuid/view.json by ignoring rev', function () {
+        expect(rewriteURL(rules, '15c9a2dcd55c963fdedf2c18a1471b03/view.json?referer=abc&rev=161-13da947c771e6847466bc8f0cd43f9ae')).toEqual('https://mydb.cheminfo.org/db/visualizer/entry/15c9a2dcd55c963fdedf2c18a1471b03/view.json');
     });
 
     it('should not rewrite full url', function () {
