@@ -17,6 +17,8 @@ import Tabs from '../main/Tabs';
 import iframeMessageHandler from '../main/iframeMessageHandler';
 import iframeBridge from '../main/iframe-bridge';
 import tabStorage from '../main/tabStorage';
+import {rewriteURL} from '../util';
+
 
 var conf = require('../config/config.js');
 
@@ -122,15 +124,12 @@ class App extends React.Component {
         }
 
         if (conf.rewriteRules) {
-            for (let i = 0; i < conf.rewriteRules.length; i++) {
-                var rewriteRule = conf.rewriteRules[i];
-                let url = possibleViews[obj.id].url;
-                let reg = new RegExp(rewriteRule.reg);
-                if(url.match(reg)) {
-                    possibleViews[obj.id].rewrittenUrl = url.replace(reg, rewriteRule.replace);
-                    break;
-                }
+
+            let newURL = rewriteURL(conf.rewriteRules, possibleViews[obj.id].url)
+            if (newURL) {
+                possibleViews[obj.id].rewrittenUrl = newURL;
             }
+
         }
 
         this.openView(obj.id);
