@@ -11,7 +11,7 @@ const defaultOptions = {
 
 const defaultConfig = {
     title: 'visualizer-on-tabs'
-}
+};
 
 module.exports = function (options) {
     options = Object.assign({}, defaultOptions, options);
