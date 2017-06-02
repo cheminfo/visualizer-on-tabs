@@ -1,44 +1,43 @@
 import {rewriteURL} from '../util';
 
 const devRules = [
-    {"reg": "^([a-z0-9]+)\\?.*", "replace": "https://mydb.cheminfo.org/db/visualizer/entry/$1/view.json"},
-    {"reg": "^([a-z0-9]+)\/view.json\\?.*", "replace": "https://mydb.cheminfo.org/db/visualizer/entry/$1/view.json"},
-    {"reg": "^[a-z0-9]+\/view.json$", "replace": "https://mydb.cheminfo.org/db/visualizer/entry/$&"},
-    {"reg": "^[a-z0-9]+$", "replace": "https://mydb.cheminfo.org/db/visualizer/entry/$&/view.json"}
-];
-
-const prodRules = [
-    {"reg": "^([a-z0-9]+)\\?(.*)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json?$2"},
-    {"reg": "^[a-z0-9]+$", "replace": "https://couch.cheminfo.org/cheminfo-public/$&/view.json"},
-    {"reg": "^[a-z0-9]+\/view.json\\?.*", "replace": "https://couch.cheminfo.org/cheminfo-public/$&"}
-];
-
-const dockerDevRules = [
-    {"reg": "^public/([a-z0-9]+)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json"},
-    {"reg": "^public/([a-z0-9]+)\\?(.*)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json?$2"},
-    {"reg": "^private/([a-z0-9]+)$", "replace": "../roc/db/visualizer/entry/$1/view.json"},
     [
-        {"reg": "^private/([a-z0-9]+)\\?(.*)$", "replace": "../roc/db/visualizer/entry/$1/view.json?$2"},
-        {"reg": "rev=[a-z0-9\\-]+", "replace": ""},
+        {"reg": "\/view.json", "replace": "", "optionalMatch": true},
+        {"reg": "rev=[a-z0-9\\-]+", "replace": "", "optionalMatch": true},
         {"reg": "&&", "replace": "&", "optionalMatch": true},
         {"reg": "\\?&", "replace": "?", "optionalMatch": true},
         {"reg": "\\?$", "replace": "", "optionalMatch": true},
         {"reg": "\\&$", "replace": "", "optionalMatch": true},
+        {"reg": "^([a-z0-9]{32})", "replace": "https://mydb.cheminfo.org/db/visualizer/entry/$1/view.json"}
+    ]
+];
+
+const dockerDevRules = [
+    {"reg": "^public/([a-z0-9]{32})$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json"},
+    {"reg": "^public/([a-z0-9]{32})\\?(.*)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json?$2"},
+    {"reg": "^private/([a-z0-9]{32})$", "replace": "../roc/db/visualizer/entry/$1/view.json"},
+    [
+        {"reg": "^private/([a-z0-9]{32})\\?(.*)$", "replace": "../roc/db/visualizer/entry/$1/view.json?$2"},
+        {"reg": "rev=[a-z0-9\\-]+", "replace": ""},
+        {"reg": "&&", "replace": "&", "optionalMatch": true},
+        {"reg": "\\?&", "replace": "?", "optionalMatch": true},
+        {"reg": "\\?$", "replace": "", "optionalMatch": true},
+        {"reg": "\\&$", "replace": "", "optionalMatch": true}
 
     ],
-    {"reg": "^[a-z0-9]+$", "replace": "https://couch.cheminfo.org/cheminfo-public/$&/view.json"},
-    {"reg": "^([a-z0-9]+)\\?(.*)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json?$2"},
+    {"reg": "^[a-z0-9]{32}$", "replace": "https://couch.cheminfo.org/cheminfo-public/$&/view.json"},
+    {"reg": "^([a-z0-9]{32})\\?(.*)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json?$2"},
     {"reg": "^[^/]+\/view.json.*", "replace": "https://couch.cheminfo.org/cheminfo-public/$&"}
 ];
 
 const dockerProdRules = [
-    {"reg": "^public/([a-z0-9]+)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json"},
-    {"reg": "^public/([a-z0-9]+)\\?(.*)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json?$2"},
-    {"reg": "^private/([a-z0-9]+)$", "replace": "../roc/db/visualizer/entry/$1/view.json"},
-    {"reg": "^private/([a-z0-9]+)\\?(.*)$", "replace": "../roc/db/visualizer/entry/$1/view.json?$2"},
+    {"reg": "^public/([a-z0-9]{32})$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json"},
+    {"reg": "^public/([a-z0-9]{32})\\?(.*)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json?$2"},
+    {"reg": "^private/([a-z0-9]{32})$", "replace": "../roc/db/visualizer/entry/$1/view.json"},
+    {"reg": "^private/([a-z0-9]{32})\\?(.*)$", "replace": "../roc/db/visualizer/entry/$1/view.json?$2"},
     {"reg": "../couch/visualizer/(.*)", "replace": "../roc/db/visualizer/entry/$1"},
-    {"reg": "^[a-z0-9]+$", "replace": "https://couch.cheminfo.org/cheminfo-public/$&/view.json"},
-    {"reg": "^([a-z0-9]+)\\?(.*)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json?$2"},
+    {"reg": "^[a-z0-9]{32}$", "replace": "https://couch.cheminfo.org/cheminfo-public/$&/view.json"},
+    {"reg": "^([a-z0-9]{32})\\?(.*)$", "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json?$2"},
     {"reg": "^[^/]+\/view.json.*", "replace": "https://couch.cheminfo.org/cheminfo-public/$&"}
 ];
 
@@ -53,7 +52,7 @@ describe('dev rewrite rules', function () {
     assertRewrite(
         'should rewrite uuid with rev by ignoring rev',
         '15c9a2dcd55c963fdedf2c18a1471b03?referer=abc&rev=161-13da947c771e6847466bc8f0cd43f9ae',
-        'https://mydb.cheminfo.org/db/visualizer/entry/15c9a2dcd55c963fdedf2c18a1471b03/view.json'
+        'https://mydb.cheminfo.org/db/visualizer/entry/15c9a2dcd55c963fdedf2c18a1471b03/view.json?referer=abc'
     );
 
     assertRewrite(
@@ -65,36 +64,9 @@ describe('dev rewrite rules', function () {
     assertRewrite(
         'should rewrite uuid/view.json by ignoring rev',
         '15c9a2dcd55c963fdedf2c18a1471b03/view.json?referer=abc&rev=161-13da947c771e6847466bc8f0cd43f9ae',
-        'https://mydb.cheminfo.org/db/visualizer/entry/15c9a2dcd55c963fdedf2c18a1471b03/view.json'
+        'https://mydb.cheminfo.org/db/visualizer/entry/15c9a2dcd55c963fdedf2c18a1471b03/view.json?referer=abc'
     );
 
-    assertRewrite(
-        'should not rewrite full url',
-        'https://mydb.cheminfo.org',
-        null
-    );
-});
-
-describe('prod rewrite rules', function () {
-   const rules = prodRules;
-   const assertRewrite = testRewrite(rules);
-
-    assertRewrite(
-        'should rewrite uuid',
-        '15c9a2dcd55c963fdedf2c18a1471b03',
-        'https://couch.cheminfo.org/cheminfo-public/15c9a2dcd55c963fdedf2c18a1471b03/view.json'
-    );
-
-    assertRewrite(
-        'should rewrite uuid with rev and referer',
-        '15c9a2dcd55c963fdedf2c18a1471b03?referer=abc&rev=161-13da947c771e6847466bc8f0cd43f9ae',
-        'https://couch.cheminfo.org/cheminfo-public/15c9a2dcd55c963fdedf2c18a1471b03/view.json?referer=abc&rev=161-13da947c771e6847466bc8f0cd43f9ae'
-    );
-    assertRewrite(
-        'should rewrite uuid/view.json with rev and referer',
-        '15c9a2dcd55c963fdedf2c18a1471b03/view.json?referer=abc&rev=161-13da947c771e6847466bc8f0cd43f9ae',
-        'https://couch.cheminfo.org/cheminfo-public/15c9a2dcd55c963fdedf2c18a1471b03/view.json?referer=abc&rev=161-13da947c771e6847466bc8f0cd43f9ae'
-    );
     assertRewrite(
         'should not rewrite full url',
         'https://mydb.cheminfo.org',
