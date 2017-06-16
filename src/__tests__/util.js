@@ -18,7 +18,7 @@ const dockerDevRules = [
     {"reg": "^private/([a-z0-9]{32})$", "replace": "../roc/db/visualizer/entry/$1/view.json"},
     [
         {"reg": "^private/([a-z0-9]{32})\\?(.*)$", "replace": "../roc/db/visualizer/entry/$1/view.json?$2"},
-        {"reg": "rev=[a-z0-9\\-]+", "replace": ""},
+        {"reg": "rev=[a-z0-9\\-]+", "replace": "", "optionalMatch": true},
         {"reg": "&&", "replace": "&", "optionalMatch": true},
         {"reg": "\\?&", "replace": "?", "optionalMatch": true},
         {"reg": "\\?$", "replace": "", "optionalMatch": true},
@@ -73,6 +73,8 @@ describe('dev rewrite rules', function () {
         null
     );
 });
+
+
 
 describe('docker prod rewrite rules', function () {
     const assertRewrite = testRewrite(dockerProdRules);
@@ -203,6 +205,12 @@ describe('docker dev rewrite rules', function () {
         'should not rewrite full url',
         'https://mydb.cheminfo.org',
         null
+    );
+
+    assertRewrite(
+        'should rewrite private uuid with referer but no rev',
+        'private/e27ac50b9f8b4b7c136aa92d53bad25c?referer=http%3A%2F%2Fclo2v1.mylims.org%2F',
+        '../roc/db/visualizer/entry/e27ac50b9f8b4b7c136aa92d53bad25c/view.json?referer=http%3A%2F%2Fclo2v1.mylims.org%2F'
     );
 });
 
