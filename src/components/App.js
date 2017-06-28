@@ -21,6 +21,10 @@ import {rewriteURL} from '../util';
 
 
 const conf = require('../config/config.js');
+
+// Setting this to true should load all the tabs on page load
+// It is discouraged to do this because loading hidden iframes
+// lead to layout issues. Especially in Firefox.
 const loadHidden = conf.loadHidden || false;
 
 
