@@ -47,7 +47,14 @@ class App extends React.Component {
             }
         });
 
-        Tabs.on('openTab', this.doTab.bind(this));
+        Tabs.on('openTab', (obj) => {
+            const options = {};
+            ['noFocus', 'noFocusEvent', 'noData'].forEach(prop => {
+                options[prop] = obj[prop];
+                delete obj[prop];
+            });
+            this.doTab(obj, options);
+        });
         Tabs.on('status', this.setTabStatus.bind(this));
         Tabs.on('message', this.sendTabMessage.bind(this));
         Tabs.on('focus', this.focusTab.bind(this));
@@ -122,8 +129,7 @@ class App extends React.Component {
     async focusTab(tabId) {
         if (this.state.viewsList.find(el => el.id === tabId)) {
             await this.showTab(tabId, {
-                noData: true,
-                noSave: true
+                noData: true
             });
         }
     }
@@ -239,7 +245,6 @@ class App extends React.Component {
 
         await this.showTab(newActiveTab, {
             noData: true,
-            noSave: true,
             force: true
         });
     }
@@ -253,8 +258,7 @@ class App extends React.Component {
 
     async onActiveTab(key) {
         await this.showTab(key, {
-            noData: true,
-            noSave: true
+            noData: true
         });
     }
 
