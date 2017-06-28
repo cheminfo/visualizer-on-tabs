@@ -63,26 +63,30 @@ class App extends React.Component {
     }
 
     async loadTabs() {
-        const data = tabStorage.load();
         let firstTab;
+        const loadTab = async (view) => {
+            if(!firstTab) firstTab = view.id;
+            await this.doTab(view, {
+                noFocus: !loadHidden,
+                noFocusEvent: true
+            });
+        };
+        const data = tabStorage.load();
         // Load possible views first
         for (let key in possibleViews) {
             possibleViews[key].id = key;
-            if(!data.find(el => el.id === key)) {
-                if(!firstTab) firstTab = possibleViews[key].id;
-                await this.doTab(possibleViews[key], {
-                    noFocus: !loadHidden,
-                    noFocusEvent: true
-                });
+            let saved;
+            if(saved = data.find(el => el.id === key)) {
+               await loadTab(saved);
+            } else {
+                await loadTab(possibleViews[key]);
             }
         }
 
         for (let i = 0; i < data.length; i++) {
-            if(!firstTab) firstTab = data[i].id;
-            await this.doTab(data[i], {
-                noFocus: !loadHidden,
-                noFocusEvent: true
-            });
+            if(!possibleViews[data[i].id]) {
+                await loadTab(data[i]);
+            }
         }
 
         if(!loadHidden) {
