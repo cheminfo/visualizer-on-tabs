@@ -21,6 +21,7 @@ import {rewriteURL} from '../util';
 
 
 var conf = require('../config/config.js');
+const loadHidden = conf.loadHidden || false;
 
 
 const possibleViews = conf.possibleViews;
@@ -42,13 +43,7 @@ class App extends React.Component {
         IframeBridge.registerHandler('admin', (data, [level2]) => {
             if (level2 === 'connect' && data.windowID !== undefined) {
                 possibleViews[currentIframe.id].windowID = data.windowID;
-                possibleViews[currentIframe.id].id = currentIframe.id;
                 currentIframe.resolve();
-                if (possibleViews[currentIframe.id].data) {
-                    IframeBridge.postMessage('tab.data', possibleViews[currentIframe.id].data, data.windowID);
-                }
-                this.sendTabFocusEvent(currentIframe.id, true);
-                tabStorage.save(currentIframe.id, possibleViews[currentIframe.id]);
             }
         });
 
@@ -64,20 +59,37 @@ class App extends React.Component {
             activeTabKey: 0
         };
 
-        for (var key in possibleViews) {
-            possibleViews[key].id = key;
-            this.doTab(possibleViews[key]);
-        }
-
         this.loadTabs();
     }
 
-    loadTabs() {
+    async loadTabs() {
         var data = tabStorage.load();
+        let firstTab;
+        // Load possible views first
+        for (var key in possibleViews) {
+            possibleViews[key].id = key;
+            if(!data.find(el => el.id === key)) {
+                if(!firstTab) firstTab = possibleViews[key].id;
+                await this.doTab(possibleViews[key], {
+                    noFocus: !loadHidden,
+                    noFocusEvent: true
+                });
+            }
+        }
 
         for (let i = 0; i < data.length; i++) {
-            this.doTab(data[i]);
+            if(!firstTab) firstTab = data[i].id;
+            await this.doTab(data[i], {
+                noFocus: !loadHidden,
+                noFocusEvent: true
+            });
         }
+
+        if(!loadHidden) {
+            // Nothing is focused at this point
+            await this.showTab(firstTab);
+        }
+
     }
 
     setTabStatus(data) {
@@ -103,18 +115,19 @@ class App extends React.Component {
         }
     }
 
-    focusTab(tabId) {
+    async focusTab(tabId) {
         if (this.state.viewsList.find(el => el.id === tabId)) {
-            this.sendTabFocusEvent(tabId);
-            this.setState({
-                activeTabKey: tabId
+            await this.showTab(tabId, {
+                noData: true,
+                noSave: true
             });
         }
     }
 
-    doTab(obj) {
+    async doTab(obj, options) {
         if (!possibleViews[obj.id]) {
             possibleViews[obj.id] = {
+                id: obj.id,
                 url: obj.url,
                 data: obj.data,
                 closable: obj.closable
@@ -124,59 +137,77 @@ class App extends React.Component {
         }
 
         if (conf.rewriteRules) {
-
-            let newURL = rewriteURL(conf.rewriteRules, possibleViews[obj.id].url)
+            let newURL = rewriteURL(conf.rewriteRules, possibleViews[obj.id].url);
             if (newURL) {
                 possibleViews[obj.id].rewrittenUrl = newURL;
             }
-
         }
 
-        this.openView(obj.id);
+        await this.showTab(obj.id, options);
     }
 
-    openView(id) {
-        var viewInfo = possibleViews[id];
-        if (this.state.viewsList.find(el => el.id === id)) { // select tab with existing view
-            this.setState({
-                activeTabKey: id
-            });
-            if (viewInfo.data) {
-                IframeBridge.postMessage('tab.data', viewInfo.data, viewInfo.windowID);
-                tabStorage.save(id, viewInfo);
-            }
-        } else { // add a new View
-            tabInit = tabInit.then(() => {
-                return new Promise(resolve => {
-                    if (this.state.viewsList.find(el => el.id === id)) {
-                        // ignore open view
-                        return resolve();
-                    }
-                    let view = {
-                        id: id,
-                        url: viewInfo.url,
-                        rewrittenUrl: viewInfo.rewrittenUrl,
-                        closable: viewInfo.closable
-                    };
-                    this.state.viewsList.push(view);
-                    this.setState({
-                        viewsList: this.state.viewsList,
-                        activeTabKey: id
-                    });
-                    setTimeout(() => {
-                        // This will have an effect only if Promise is not yet resolved
-                        return resolve();
-                    }, 3000);
-                    currentIframe = {
-                        resolve,
-                        id
-                    };
+    async showTab(id, options) {
+        if(this.state.activeTabKey === id) return;
+
+        options = options || {};
+
+        const noFocus = options.noFocus;
+        let viewFromList = this.state.viewsList.find(el => el.id === id);
+        const newTab = !viewFromList;
+        const viewInfo = possibleViews[id];
+        if (!viewInfo) throw new Error('unreachable');
+        if (!viewFromList) {
+            viewFromList = {
+                id: id,
+                url: viewInfo.url,
+                rewrittenUrl: viewInfo.rewrittenUrl,
+                closable: viewInfo.closable
+            };
+            this.state.viewsList.push(viewFromList)
+        }
+        const firstRender = !noFocus && (newTab || !viewFromList.rendered);
+
+        await tabInit;
+        if (firstRender) { // We should map the tab id with the window ID generated by IframeBridge
+            tabInit = new Promise(resolve => {
+                viewFromList.rendered = true;
+                this.setState({
+                    activeTabKey: id,
+                    viewsList: this.state.viewsList
                 });
+                setTimeout(() => {
+                    // This will have an effect only if Promise is not yet resolved
+                    return resolve();
+                }, 3000);
+                currentIframe = {
+                    resolve,
+                    id
+                };
             });
+            await tabInit;
+        } else { // Either it has already been renderer, or it is not to be focused
+            if (noFocus) {
+                this.setState({
+                    viewsList: this.state.viewsList
+                });
+            } else {
+                this.setState({
+                    activeTabKey: id
+                });
+            }
         }
-    }
+        if (viewInfo.data && (!options.noData || firstRender)) { // always send data on first render
+            IframeBridge.postMessage('tab.data', viewInfo.data, viewInfo.windowID);
+        }
+        tabStorage.save(id, viewInfo);
 
-    removeTab(id) {
+        if(!options.noFocusEvent) {
+            this.sendTabFocusEvent();
+        }
+
+}
+
+    async removeTab(id) {
         tabStorage.remove(id);
         if (forbiddenPossibleViews.indexOf(id) === -1) {
             delete possibleViews[id];
@@ -187,6 +218,7 @@ class App extends React.Component {
 
         var newActiveTab = 0;
         var viewsLength = this.state.viewsList.length;
+        // Set next active tab
         if (viewsLength > 0) {
             if (idx < viewsLength) {
                 newActiveTab = this.state.viewsList[idx].id;
@@ -195,25 +227,23 @@ class App extends React.Component {
             }
         }
 
-        this.sendTabFocusEvent(newActiveTab);
-
-        this.setState({
-            viewsList: this.state.viewsList,
-            activeTabKey: newActiveTab
+        await this.showTab(newActiveTab, {
+            noData: true,
+            noSave: true
         });
     }
 
-    sendTabFocusEvent(key, force) {
-        if(force || key !== this.state.activeTabKey) {
+    sendTabFocusEvent() {
+        const key = this.state.activeTabKey;
+        if(possibleViews[key]) {
             IframeBridge.postMessage('tab.focus', {}, possibleViews[key].windowID);
         }
     }
 
-    onActiveTab(key) {
-        this.sendTabFocusEvent(key);
-
-        this.setState({
-            activeTabKey: key
+    async onActiveTab(key) {
+        await this.showTab(key, {
+            noData: true,
+            noSave: true
         });
     }
 
@@ -228,19 +258,23 @@ class App extends React.Component {
             if (!saved) {
                 textStyle.color = 'red';
             }
+            const shouldRender = view.rendered || view.id === this.state.activeTabKey;
             arr.push(
                 <Tab
-                    title={<TabTitle textTitle={saved ? null : 'Not saved'} textStyle={textStyle} name={view.id} onTabClosed={closable ? this.removeTab.bind(this, view.id) : null} />}
+                    title={<TabTitle textTitle={saved ? null : 'Not saved'} textStyle={textStyle} name={view.id}
+                                     onTabClosed={closable ? this.removeTab.bind(this, view.id) : null}/>}
                     key={view.id} eventKey={view.id}>
-                    <Visualizer
-                        fallbackVersion={conf.visualizerFallbackVersion || 'latest'}
-                        cdn="https://www.lactame.com/visualizer"
-                        viewURL={view.rewrittenUrl || view.url}
-                        version={this.visualizerVersion || conf.visualizerVersion || 'auto'}
-                        config={conf.visualizerConfig}
-                        scripts={[iframeBridge]}
-                        style={{position:'static', flex: 2, border: 'none'}}
-                    />
+                    {shouldRender ?
+                        <Visualizer
+                            fallbackVersion={conf.visualizerFallbackVersion || 'latest'}
+                            cdn="https://www.lactame.com/visualizer"
+                            viewURL={view.rewrittenUrl || view.url}
+                            version={this.visualizerVersion || conf.visualizerVersion || 'auto'}
+                            config={conf.visualizerConfig}
+                            scripts={[iframeBridge]}
+                            style={{position: 'static', flex: 2, border: 'none'}}
+                        />
+                        : <div>Not rendered</div> }
                 </Tab>
             );
         }
@@ -249,7 +283,7 @@ class App extends React.Component {
             <div className="visualizer-on-tabs-app">
                 <Login></Login>
                 <div className="visualizer-on-tabs-content">
-                    <BTabs style={{flex: 2, display:'flex', flexFlow: 'column'}} activeKey={this.state.activeTabKey}
+                    <BTabs style={{flex: 2, display: 'flex', flexFlow: 'column'}} activeKey={this.state.activeTabKey}
                            onSelect={this.onActiveTab.bind(this)} animation={false}>
                         {arr}
                     </BTabs>

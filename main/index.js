@@ -56,15 +56,23 @@ module.exports = function (options) {
                                 path.resolve(__dirname, '../src'),
                                 path.resolve(__dirname, '../node_modules/iframe-bridge')
                             ],
-                            loader: 'babel',
+                            loader: 'babel-loader',
                             query: {
-                                presets: ['es2015', 'react']
+                                presets: [['env', {
+                                    targets: {
+                                        browsers: [
+                                            'chrome >= 54',
+                                            'firefox >= 45',
+                                            'last 2 edge versions'
+                                        ]
+                                    }
+                                }], 'react']
                             }
                         },
                         {
                             test: /\.json$/,
                             include: [path.resolve(__dirname, '../src')],
-                            loader: 'json'
+                            loader: 'json-loader'
                         }
                     ]
                 },
