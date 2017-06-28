@@ -20,7 +20,7 @@ import tabStorage from '../main/tabStorage';
 import {rewriteURL} from '../util';
 
 
-var conf = require('../config/config.js');
+const conf = require('../config/config.js');
 const loadHidden = conf.loadHidden || false;
 
 
@@ -31,7 +31,7 @@ let tabInit = Promise.resolve();
 let currentIframe;
 
 function getParameterByName(name) {
-    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    const match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
 }
 
@@ -63,10 +63,10 @@ class App extends React.Component {
     }
 
     async loadTabs() {
-        var data = tabStorage.load();
+        const data = tabStorage.load();
         let firstTab;
         // Load possible views first
-        for (var key in possibleViews) {
+        for (let key in possibleViews) {
             possibleViews[key].id = key;
             if(!data.find(el => el.id === key)) {
                 if(!firstTab) firstTab = possibleViews[key].id;
@@ -94,7 +94,7 @@ class App extends React.Component {
 
     setTabStatus(data) {
         // Find view with given window ID
-        var ids = Object.keys(possibleViews);
+        const ids = Object.keys(possibleViews);
         let id = ids.find(id => possibleViews[id].windowID === data.windowID);
         if (!id) return;
         let view = possibleViews[id];
@@ -147,14 +147,15 @@ class App extends React.Component {
     }
 
     async showTab(id, options) {
-        if(this.state.activeTabKey === id) return;
-
         options = options || {};
+        const sameTab = this.state.activeTabKey === id;
+        if(sameTab && !options.force) return;
 
         const noFocus = options.noFocus;
         let viewFromList = this.state.viewsList.find(el => el.id === id);
         const newTab = !viewFromList;
         const viewInfo = possibleViews[id];
+
         if (!viewInfo) throw new Error('unreachable');
         if (!viewFromList) {
             viewFromList = {
@@ -201,7 +202,7 @@ class App extends React.Component {
         }
         tabStorage.save(id, viewInfo);
 
-        if(!options.noFocusEvent) {
+        if(!options.noFocusEvent && !sameTab) {
             this.sendTabFocusEvent();
         }
 
@@ -216,20 +217,26 @@ class App extends React.Component {
         if (idx === -1) return;
         this.state.viewsList.splice(idx, 1);
 
-        var newActiveTab = 0;
-        var viewsLength = this.state.viewsList.length;
-        // Set next active tab
-        if (viewsLength > 0) {
-            if (idx < viewsLength) {
-                newActiveTab = this.state.viewsList[idx].id;
-            } else {
-                newActiveTab = this.state.viewsList[viewsLength - 1].id;
+        let newActiveTab;
+        if(id !== this.state.activeTabKey) {
+            newActiveTab = this.state.activeTabKey;
+        } else {
+            const viewsLength = this.state.viewsList.length;
+            // Set next active tab
+            if (viewsLength > 0) {
+                if (idx < viewsLength) {
+                    newActiveTab = this.state.viewsList[idx].id;
+                } else {
+                    newActiveTab = this.state.viewsList[viewsLength - 1].id;
+                }
             }
         }
 
+
         await this.showTab(newActiveTab, {
             noData: true,
-            noSave: true
+            noSave: true,
+            force: true
         });
     }
 
@@ -248,13 +255,13 @@ class App extends React.Component {
     }
 
     render() {
-        var arr = [];
+        const arr = [];
 
         for (let view of this.state.viewsList) {
-            var closable = view.closable === undefined ? true : view.closable;
-            var saved = !view.status || view.status.saved === undefined ? true : view.status.saved;
+            const closable = view.closable === undefined ? true : view.closable;
+            const saved = !view.status || view.status.saved === undefined ? true : view.status.saved;
 
-            var textStyle = {};
+            const textStyle = {};
             if (!saved) {
                 textStyle.color = 'red';
             }
