@@ -102,7 +102,12 @@ class App extends React.Component {
 
         if(!loadHidden) {
             // Nothing is focused at this point
-            await this.showTab(firstTab);
+            const lastSelected = tabStorage.getSelected();
+            if(this.state.viewsList.find(el => el.id === lastSelected)) {
+                await this.showTab(lastSelected);
+            } else {
+                await this.showTab(firstTab);
+            }
         }
 
     }
@@ -215,7 +220,9 @@ class App extends React.Component {
             IframeBridge.postMessage('tab.data', viewInfo.data, viewInfo.windowID);
         }
         tabStorage.save(id, viewInfo);
-
+        if(!options.noFocus) {
+            tabStorage.saveSelected(id);
+        }
         if(!options.noFocusEvent && !sameTab) {
             this.sendTabFocusEvent();
         }

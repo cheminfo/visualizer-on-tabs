@@ -4,6 +4,7 @@ import lockr from 'lockr';
 
 const LOCAL_STORAGE_TAB_DATA = 'vweb-';
 const LOCAL_STORAGE_TAB_IDS = 'vweb1-tab-ids';
+const LOCAL_STORAGE_LAST_TAB = 'vweb1-selected-tab';
 
 let storage = {};
 
@@ -12,6 +13,15 @@ storage.save = function (tabId, data) {
     lockr.sadd(LOCAL_STORAGE_TAB_IDS, tabId);
     var key = LOCAL_STORAGE_TAB_DATA + tabId;
     lockr.set(key, data);
+};
+
+storage.saveSelected = function (tabId) {
+    if (!tabId) return;
+    lockr.set(LOCAL_STORAGE_LAST_TAB, tabId);
+};
+
+storage.getSelected = function() {
+    return lockr.get(LOCAL_STORAGE_LAST_TAB);
 };
 
 storage.load = function () {
