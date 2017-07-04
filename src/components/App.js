@@ -46,8 +46,15 @@ class App extends React.Component {
         IframeBridge.registerHandler('tab', iframeMessageHandler);
         IframeBridge.registerHandler('admin', (data, [level2]) => {
             if (level2 === 'connect' && data.windowID !== undefined) {
-                possibleViews[currentIframe.id].windowID = data.windowID;
-                currentIframe.resolve();
+                if(!currentIframe) {
+                    // The iframe was refreshed
+                    possibleViews[this.state.activeTabKey].windowID = data.windowID;
+                    this.sendData(this.state.activeTabKey);
+                } else {
+                    possibleViews[currentIframe.id].windowID = data.windowID;
+                    currentIframe.resolve();
+                    currentIframe = null;
+                }
             }
         });
 
@@ -215,9 +222,10 @@ class App extends React.Component {
                 viewsList: this.state.viewsList
             });
         }
+
         // always send data on first render
         if (viewInfo.data && (!options.noData || firstRender)) {
-            IframeBridge.postMessage('tab.data', viewInfo.data, viewInfo.windowID);
+            this.sendData(id);
         }
         tabStorage.save(id, viewInfo);
         if (!options.noFocus) {
@@ -227,6 +235,11 @@ class App extends React.Component {
             this.sendTabFocusEvent();
         }
 
+    }
+
+    sendData(id) {
+        const viewInfo = possibleViews[id];
+        IframeBridge.postMessage('tab.data', viewInfo.data, viewInfo.windowID);
     }
 
     async removeTab(id) {
