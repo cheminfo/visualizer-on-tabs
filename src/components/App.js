@@ -36,7 +36,7 @@ const pageURL = new URL(window.location);
 const pageQueryParameters = (function() {
   let params = {};
   for (let key of pageURL.searchParams.keys()) {
-    params[key] = pageURL.get(key);
+    params[key] = pageURL.searchParams.get(key);
   }
   return params;
 })();
