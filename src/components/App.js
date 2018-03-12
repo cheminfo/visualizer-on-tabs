@@ -32,10 +32,14 @@ const forbiddenPossibleViews = Object.keys(possibleViews);
 let tabInit = Promise.resolve();
 let currentIframe;
 
-function getParameterByName(name) {
-  const match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
-  return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-}
+const pageURL = new URL(window.location);
+const pageQueryParameters = (function() {
+  let params = {};
+  for (let key of pageURL.searchParams.keys()) {
+    params[key] = pageURL.get(key);
+  }
+  return params;
+})();
 
 class App extends React.Component {
   constructor() {
@@ -68,7 +72,7 @@ class App extends React.Component {
     Tabs.on('message', this.sendTabMessage.bind(this));
     Tabs.on('focus', this.focusTab.bind(this));
 
-    this.visualizerVersion = getParameterByName('v');
+    this.visualizerVersion = pageURL.get('v');
 
     this.state = {
       viewsList: [],
@@ -236,7 +240,13 @@ class App extends React.Component {
 
   sendData(id) {
     const viewInfo = possibleViews[id];
-    IframeBridge.postMessage('tab.data', viewInfo.data, viewInfo.windowID);
+    IframeBridge.postMessage(
+      'tab.data',
+      Object.assign({}, viewInfo.data, {
+        queryParameters: pageQueryParameters
+      }),
+      viewInfo.windowID
+    );
   }
 
   async removeTab(id) {
