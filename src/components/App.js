@@ -72,7 +72,7 @@ class App extends React.Component {
     Tabs.on('message', this.sendTabMessage.bind(this));
     Tabs.on('focus', this.focusTab.bind(this));
 
-    this.visualizerVersion = pageURL.get('v');
+    this.visualizerVersion = pageURL.searchParams.get('v');
 
     this.state = {
       viewsList: [],
