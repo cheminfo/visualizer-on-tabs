@@ -226,7 +226,7 @@ class App extends React.Component {
     }
 
     // always send data on first render
-    if (viewInfo.data && (!options.noData || firstRender)) {
+    if (!options.noData || firstRender) {
       this.sendData(id);
     }
     tabStorage.save(id, viewInfo);
