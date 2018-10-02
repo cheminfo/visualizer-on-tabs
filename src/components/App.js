@@ -323,7 +323,7 @@ class App extends React.Component {
           {shouldRender ? (
             <Visualizer
               fallbackVersion={conf.visualizerFallbackVersion || 'latest'}
-              cdn={conf.cdn || "https://www.lactame.com/visualizer"}
+              cdn={conf.visualizerCDN || "https://www.lactame.com/visualizer"}
               viewURL={view.rewrittenUrl || view.url}
               version={
                 this.visualizerVersion || conf.visualizerVersion || 'auto'
