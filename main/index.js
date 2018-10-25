@@ -3,7 +3,7 @@
 const webpack = require('webpack');
 const _ = require('lodash');
 const path = require('path');
-const fs = require('fs-promise');
+const fs = require('fs-extra');
 const WebpackOnBuildPlugin = require('on-build-webpack');
 
 const defaultOptions = {
@@ -14,22 +14,17 @@ const defaultConfig = {
   title: 'visualizer-on-tabs'
 };
 
-module.exports = function(options) {
+module.exports = async function(options) {
   options = Object.assign({}, defaultOptions, options);
   options.config = Object.assign({}, defaultConfig, options.config);
 
   const outDir = path.resolve(__dirname, '..', options.outDir);
 
   const confPath = path.join(__dirname, '../src/config/custom.json');
-  return fs
-    .writeFile(confPath, JSON.stringify(options.config))
-    .then(function() {
-      return Promise.all([buildApp(), copyContent()]);
-    })
-    .then(() => addIndex(options))
-    .then(function() {
-      return fs.unlink(confPath);
-    });
+  await fs.writeFile(confPath, JSON.stringify(options.config));
+  await Promise.all([buildApp(), copyContent()]);
+  await addIndex(options);
+  return fs.unlink(confPath);
 
   function buildApp() {
     const entries = [{ file: 'app.js' }];
@@ -42,13 +37,15 @@ module.exports = function(options) {
       });
       prom.push(p);
       let config = {
+        mode: options.debug ? 'development' : 'production',
         entry: path.join(__dirname, '../src', entry.file),
         output: {
           path: outDir,
           filename: entry.file
         },
+        devtool: 'source-map',
         module: {
-          loaders: [
+          rules: [
             {
               test: /\.js$/,
               include: [
@@ -56,10 +53,10 @@ module.exports = function(options) {
                 path.resolve(__dirname, '../node_modules/iframe-bridge')
               ],
               loader: 'babel-loader',
-              query: {
+              options: {
                 presets: [
                   [
-                    'env',
+                    '@babel/env',
                     {
                       targets: {
                         browsers: [
@@ -70,14 +67,9 @@ module.exports = function(options) {
                       }
                     }
                   ],
-                  'react'
+                  '@babel/react'
                 ]
               }
-            },
-            {
-              test: /\.json$/,
-              include: [path.resolve(__dirname, '../src')],
-              loader: 'json-loader'
             }
           ]
         },
@@ -89,14 +81,6 @@ module.exports = function(options) {
         ],
         watch: options.watch
       };
-
-      if (!options.debug) {
-        config.plugins.unshift(
-          new webpack.DefinePlugin({
-            'process.env.NODE_ENV': '"production"'
-          })
-        );
-      }
 
       webpack(config, function(err, stats) {
         var jsonStats = stats.toJson();
@@ -122,19 +106,19 @@ module.exports = function(options) {
     return fs.copy(path.join(__dirname, '../src/content'), outDir);
   }
 
-  function addIndex() {
-    return fs
-      .readFile(path.join(__dirname, '../src/template/index.html'), 'utf8')
-      .then(function(content) {
-        const tpl = _.template(content);
-        return fs.writeFile(
-          path.join(outDir, 'index.html'),
-          tpl({
-            title: options.config.title,
-            uniqid: Date.now()
-          })
-        );
-      });
+  async function addIndex() {
+    const content = await fs.readFile(
+      path.join(__dirname, '../src/template/index.html'),
+      'utf8'
+    );
+    const tpl = _.template(content);
+    return fs.writeFile(
+      path.join(outDir, 'index.html'),
+      tpl({
+        title: options.config.title,
+        uniqid: Date.now()
+      })
+    );
   }
 
   function printErrors(errors) {

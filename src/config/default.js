@@ -1,17 +1,17 @@
 'use strict';
 
 module.exports = {
-    visualizerConfig: {
-        debugLevel: 0,
-        filters: [],
-        modules: {
-            folders: ['modules/types']
-        },
-        header: false
+  visualizerConfig: {
+    debugLevel: 0,
+    filters: [],
+    modules: {
+      folders: ['modules/types']
     },
-    possibleViews: {
-        Home: {
-            url: ''
-        }
+    header: false
+  },
+  possibleViews: {
+    Home: {
+      url: ''
     }
+  }
 };

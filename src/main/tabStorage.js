@@ -34,17 +34,17 @@ storage.load = function() {
   var ids = lockr.smembers(LOCAL_STORAGE_TAB_IDS);
   if (!ids) return [];
 
-  var data = ids.map(id => {
+  var data = ids.map((id) => {
     return lockr.get(LOCAL_STORAGE_TAB_DATA + id);
   });
 
-  data.forEach(entry => {
+  data.forEach((entry) => {
     if (!isVersionOK(entry.version)) {
       storage.remove(entry.id);
     }
   });
 
-  data = data.filter(entry => isVersionOK(entry.version));
+  data = data.filter((entry) => isVersionOK(entry.version));
 
   data.sort(function(a, b) {
     var idxA = ids.indexOf(a.id);

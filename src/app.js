@@ -7,12 +7,12 @@ import App from './components/App';
 let loc = window.location;
 let hash = loc.hash.slice(1);
 if (!hash) {
-    hash = 'main';
+  hash = 'main';
 }
 
 let props = {
-    origin: loc.origin,
-    path: hash
+  origin: loc.origin,
+  path: hash
 };
 
 let element = React.createElement(App, props);

@@ -60,9 +60,9 @@ class App extends React.Component {
       }
     });
 
-    Tabs.on('openTab', obj => {
+    Tabs.on('openTab', (obj) => {
       const options = {};
-      ['noFocus', 'noFocusEvent', 'noData', 'load'].forEach(prop => {
+      ['noFocus', 'noFocusEvent', 'noData', 'load'].forEach((prop) => {
         options[prop] = obj[prop];
         delete obj[prop];
       });
@@ -84,7 +84,7 @@ class App extends React.Component {
 
   async loadTabs() {
     let firstTab;
-    const loadTab = async view => {
+    const loadTab = async (view) => {
       if (!firstTab) firstTab = view.id;
       await this.doTab(view, {
         noFocus: true,
@@ -97,7 +97,7 @@ class App extends React.Component {
     for (let key in possibleViews) {
       possibleViews[key].id = key;
       let saved;
-      if ((saved = data.find(el => el.id === key))) {
+      if ((saved = data.find((el) => el.id === key))) {
         await loadTab(saved);
       } else {
         await loadTab(possibleViews[key]);
@@ -112,7 +112,7 @@ class App extends React.Component {
 
     // Nothing is focused at this point
     const lastSelected = tabStorage.getSelected();
-    if (this.state.viewsList.find(el => el.id === lastSelected)) {
+    if (this.state.viewsList.find((el) => el.id === lastSelected)) {
       await this.showTab(lastSelected);
     } else {
       await this.showTab(firstTab);
@@ -122,11 +122,11 @@ class App extends React.Component {
   setTabStatus(data) {
     // Find view with given window ID
     const ids = Object.keys(possibleViews);
-    let id = ids.find(id => possibleViews[id].windowID === data.windowID);
+    let id = ids.find((id) => possibleViews[id].windowID === data.windowID);
     if (!id) return;
     let view = possibleViews[id];
 
-    view = this.state.viewsList.find(el => el.id === view.id);
+    view = this.state.viewsList.find((el) => el.id === view.id);
     if (!view) return;
 
     view.status = Object.assign({}, view.status, data.message);
@@ -143,7 +143,7 @@ class App extends React.Component {
   }
 
   async focusTab(tabId) {
-    if (this.state.viewsList.find(el => el.id === tabId)) {
+    if (this.state.viewsList.find((el) => el.id === tabId)) {
       await this.showTab(tabId, {
         noData: true
       });
@@ -178,7 +178,7 @@ class App extends React.Component {
     if (sameTab && !options.force) return;
 
     const noFocus = options.noFocus;
-    let viewFromList = this.state.viewsList.find(el => el.id === id);
+    let viewFromList = this.state.viewsList.find((el) => el.id === id);
     const newTab = !viewFromList;
     const viewInfo = possibleViews[id];
 
@@ -199,7 +199,7 @@ class App extends React.Component {
     // We need to get the IframeBridge ID of that frame and prevent any other iframes
     // to load during that time
     if (firstRender) {
-      tabInit = new Promise(resolve => {
+      tabInit = new Promise((resolve) => {
         viewFromList.rendered = true;
         this.setState({
           activeTabKey: options.noFocus ? undefined : id,
@@ -254,7 +254,7 @@ class App extends React.Component {
     if (forbiddenPossibleViews.indexOf(id) === -1) {
       delete possibleViews[id];
     }
-    let idx = this.state.viewsList.findIndex(el => el.id === id);
+    let idx = this.state.viewsList.findIndex((el) => el.id === id);
     if (idx === -1) return;
     this.state.viewsList.splice(idx, 1);
 
@@ -317,13 +317,14 @@ class App extends React.Component {
               onTabClosed={closable ? this.removeTab.bind(this, view.id) : null}
             />
           }
+          id={view.id}
           key={view.id}
           eventKey={view.id}
         >
           {shouldRender ? (
             <Visualizer
               fallbackVersion={conf.visualizerFallbackVersion || 'latest'}
-              cdn={conf.visualizerCDN || "https://www.lactame.com/visualizer"}
+              cdn={conf.visualizerCDN || 'https://www.lactame.com/visualizer'}
               viewURL={view.rewrittenUrl || view.url}
               version={
                 this.visualizerVersion || conf.visualizerVersion || 'auto'
