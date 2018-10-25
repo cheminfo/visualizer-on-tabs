@@ -15,14 +15,18 @@ if (argv.watch) options.watch = argv.watch;
 if (argv.outDir) options.outDir = argv.outDir;
 if (argv.debug) options.debug = argv.debug;
 
-if(argv.config) {
-    const configFile = path.resolve(path.join(__dirname, '..'), argv.config);
-    options.config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'), {filename: configFile});
+if (argv.config) {
+  const configFile = path.resolve(path.join(__dirname, '..'), argv.config);
+  options.config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'), {
+    filename: configFile
+  });
 }
 
-build(options).then(function () {
+build(options)
+  .then(function() {
     console.log('Build succeeded');
-}).catch(function (e) {
+  })
+  .catch(function(e) {
     console.log(e.message, e.stack);
     console.error('Build failed');
-});
+  });
