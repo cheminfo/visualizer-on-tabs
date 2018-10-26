@@ -34,9 +34,12 @@ const pageQueryParameters = (function () {
   return params;
 })();
 
+const iframeStyle = { position: 'static', flex: 2, border: 'none' };
+
 class App extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    this.onActiveTab = this.onActiveTab.bind(this);
 
     IframeBridge.registerHandler('tab', iframeMessageHandler);
     IframeBridge.registerHandler('admin', (data, [level2]) => {
@@ -149,7 +152,8 @@ class App extends React.Component {
         id: obj.id,
         url: obj.url,
         data: obj.data,
-        closable: obj.closable
+        closable: obj.closable,
+        rawIframe: obj.rawIframe
       };
     } else {
       possibleViews[obj.id].data = obj.data;
@@ -181,7 +185,8 @@ class App extends React.Component {
         id: id,
         url: viewInfo.url,
         rewrittenUrl: viewInfo.rewrittenUrl,
-        closable: viewInfo.closable
+        closable: viewInfo.closable,
+        rawIframe: viewInfo.rawIframe
       };
       this.state.viewsList.push(viewFromList);
     }
@@ -300,6 +305,34 @@ class App extends React.Component {
         textStyle.color = 'red';
       }
       const shouldRender = view.rendered || view.id === this.state.activeTabKey;
+      let viewPage;
+      if (shouldRender) {
+        if (view.rawIframe) {
+          viewPage = (
+            <iframe
+              allowFullScreen
+              src={view.rewrittenUrl || view.url}
+              style={iframeStyle}
+            />
+          );
+        } else {
+          viewPage = (
+            <Visualizer
+              fallbackVersion={conf.visualizerFallbackVersion || 'latest'}
+              cdn={conf.visualizerCDN || 'https://www.lactame.com/visualizer'}
+              viewURL={view.rewrittenUrl || view.url}
+              version={
+                this.visualizerVersion || conf.visualizerVersion || 'auto'
+              }
+              config={conf.visualizerConfig}
+              scripts={[iframeBridge]}
+              style={iframeStyle}
+            />
+          );
+        }
+      } else {
+        viewPage = <div>Not rendered</div>;
+      }
       arr.push(
         <Tab
           title={
@@ -310,25 +343,10 @@ class App extends React.Component {
               onTabClosed={closable ? this.removeTab.bind(this, view.id) : null}
             />
           }
-          id={view.id}
           key={view.id}
           eventKey={view.id}
         >
-          {shouldRender ? (
-            <Visualizer
-              fallbackVersion={conf.visualizerFallbackVersion || 'latest'}
-              cdn={conf.visualizerCDN || 'https://www.lactame.com/visualizer'}
-              viewURL={view.rewrittenUrl || view.url}
-              version={
-                this.visualizerVersion || conf.visualizerVersion || 'auto'
-              }
-              config={conf.visualizerConfig}
-              scripts={[iframeBridge]}
-              style={{ position: 'static', flex: 2, border: 'none' }}
-            />
-          ) : (
-            <div>Not rendered</div>
-          )}
+          {viewPage}
         </Tab>
       );
     }
@@ -338,9 +356,10 @@ class App extends React.Component {
         <Login />
         <div className="visualizer-on-tabs-content">
           <BTabs
+            id="visualizer-on-tabs-tab"
             style={{ flex: 2, display: 'flex', flexFlow: 'column' }}
             activeKey={this.state.activeTabKey}
-            onSelect={this.onActiveTab.bind(this)}
+            onSelect={this.onActiveTab}
             animation={false}
           >
             {arr}
