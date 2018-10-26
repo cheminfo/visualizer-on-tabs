@@ -1,10 +1,12 @@
 'use strict';
 
 const defaultConfig = require('./default');
+
 const customConfig = getCustomConfig();
 
 function getCustomConfig() {
   try {
+    // eslint-disable-next-line import/no-unresolved
     return require('./custom.json');
   } catch (e) {
     return {};

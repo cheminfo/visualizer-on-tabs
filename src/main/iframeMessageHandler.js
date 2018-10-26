@@ -1,5 +1,3 @@
-'use strict';
-
 import Tabs from '../main/Tabs';
 
 export default function iframeMessageHandler(data, [level2]) {
@@ -22,7 +20,7 @@ export default function iframeMessageHandler(data, [level2]) {
       prom = Promise.resolve('done');
       break;
     default:
-      prom = Promise.reject(`Unknown action: ${level2}}`);
+      prom = Promise.reject(new Error(`Unknown action: ${level2}}`));
       break;
   }
 
@@ -37,10 +35,4 @@ export default function iframeMessageHandler(data, [level2]) {
       this.postMessage(data);
     }
   );
-}
-
-function wrapAsMessage(data) {
-  return {
-    data: data
-  };
 }

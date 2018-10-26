@@ -1,9 +1,19 @@
-'use strict';
-
 import React from 'react';
 import { Glyphicon } from 'react-bootstrap';
 
 class TabTitle extends React.Component {
+  constructor(props) {
+    super(props);
+    this.onClosedClicked = this.onClosedClicked.bind(this);
+  }
+  onClosedClicked(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    if (this.props.onTabClosed) {
+      this.props.onTabClosed.call();
+    }
+  }
+
   render() {
     var closeHandle;
     if (this.props.onTabClosed) {
@@ -13,7 +23,7 @@ class TabTitle extends React.Component {
           <Glyphicon
             className="close-tab-glyph"
             glyph="remove"
-            onClick={this.onClosedClicked.bind(this)}
+            onClick={this.onClosedClicked}
           />
         </span>
       );
@@ -27,14 +37,6 @@ class TabTitle extends React.Component {
         {closeHandle}
       </span>
     );
-  }
-
-  onClosedClicked(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    if (this.props.onTabClosed) {
-      this.props.onTabClosed.call();
-    }
   }
 }
 

@@ -1,11 +1,13 @@
 #!/bin/env node
 
+/* eslint-disable no-console */
+
 'use strict';
 
 const path = require('path');
 const fs = require('fs');
-const yaml = require('js-yaml');
 
+const yaml = require('js-yaml');
 const argv = require('minimist')(process.argv.slice(2));
 
 const build = require('..');
@@ -23,10 +25,10 @@ if (argv.config) {
 }
 
 build(options)
-  .then(function() {
+  .then(function () {
     console.log('Build succeeded');
   })
-  .catch(function(e) {
+  .catch(function (e) {
     console.log(e.message, e.stack);
     console.error('Build failed');
   });

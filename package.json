@@ -5,10 +5,11 @@
   "scripts": {
     "clean": "rm -rf out",
     "copy-static": "mkdir -p out && cp -r src/content/* out",
+    "eslint": "eslint bin main src",
     "webpack": "node bin/build.js --debug=1",
     "watch": "npm run copy-static && npm run webpack -- --watch",
     "build": "npm run clean && npm run webpack",
-    "test": "jest"
+    "test": "jest && npm run eslint"
   },
   "dependencies": {
     "@babel/core": "^7.1.2",
@@ -38,6 +39,14 @@
   "main": "main/index.js",
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.7.0",
+    "eslint-config-cheminfo": "^1.18.0",
+    "eslint-config-neptune-react": "^2.4.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jest": "^21.26.1",
+    "eslint-plugin-react": "^7.11.1",
     "jest": "^23.6.0"
   }
 }

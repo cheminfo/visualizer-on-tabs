@@ -1,8 +1,11 @@
 'use strict';
 
+/* eslint-disable no-console */
+
+const path = require('path');
+
 const webpack = require('webpack');
 const _ = require('lodash');
-const path = require('path');
 const fs = require('fs-extra');
 const WebpackOnBuildPlugin = require('on-build-webpack');
 
@@ -14,7 +17,7 @@ const defaultConfig = {
   title: 'visualizer-on-tabs'
 };
 
-module.exports = async function(options) {
+module.exports = async function (options) {
   options = Object.assign({}, defaultOptions, options);
   options.config = Object.assign({}, defaultConfig, options.config);
 
@@ -29,10 +32,10 @@ module.exports = async function(options) {
   function buildApp() {
     const entries = [{ file: 'app.js' }];
 
-    let prom = [];
-    for (let entry of entries) {
-      var _res;
-      var p = new Promise(function(resolve, reject) {
+    const prom = [];
+    for (const entry of entries) {
+      let _res;
+      var p = new Promise((resolve) => {
         _res = resolve;
       });
       prom.push(p);
@@ -74,7 +77,7 @@ module.exports = async function(options) {
           ]
         },
         plugins: [
-          new WebpackOnBuildPlugin(function(stats) {
+          new WebpackOnBuildPlugin(function () {
             console.log('webpack build done');
             _res();
           })
@@ -82,19 +85,19 @@ module.exports = async function(options) {
         watch: options.watch
       };
 
-      webpack(config, function(err, stats) {
+      webpack(config, function (err, stats) {
         var jsonStats = stats.toJson();
         if (err) {
           throw err;
         } else if (jsonStats.errors.length > 0) {
           printErrors(jsonStats.errors);
           if (!options.watch) {
-            throw Error('Could not build ' + entry.file);
+            throw Error(`Could not build ${entry.file}`);
           }
         } else if (jsonStats.warnings.length > 0) {
           printErrors(jsonStats.warnings);
         } else {
-          console.log('Build of ' + entry.file + ' successful');
+          console.log(`Build of ${entry.file} successful`);
         }
       });
     }
@@ -122,7 +125,7 @@ module.exports = async function(options) {
   }
 
   function printErrors(errors) {
-    errors.forEach(function(error) {
+    errors.forEach(function (error) {
       console.error(error);
     });
   }

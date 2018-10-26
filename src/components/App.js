@@ -1,23 +1,16 @@
-'use strict';
-
-window.DebugNS = '*';
-
-// Dependencies
 import IframeBridge from 'iframe-bridge';
 import React from 'react';
 import Visualizer from 'react-visualizer';
-import { Tabs as BTabs, Tab, Button } from 'react-bootstrap';
+import { Tabs as BTabs, Tab } from 'react-bootstrap';
 
-// Components
-import TabTitle from './TabTitle';
-import Login from './Login';
-
-// Other
 import Tabs from '../main/Tabs';
 import iframeMessageHandler from '../main/iframeMessageHandler';
 import iframeBridge from '../main/iframe-bridge';
 import tabStorage from '../main/tabStorage';
 import { rewriteURL } from '../util';
+
+import Login from './Login';
+import TabTitle from './TabTitle';
 
 const conf = require('../config/config.js');
 
@@ -33,7 +26,7 @@ let tabInit = Promise.resolve();
 let currentIframe;
 
 const pageURL = new URL(window.location);
-const pageQueryParameters = (function() {
+const pageQueryParameters = (function () {
   let params = {};
   for (let key of pageURL.searchParams.keys()) {
     params[key] = pageURL.searchParams.get(key);
@@ -130,9 +123,9 @@ class App extends React.Component {
     if (!view) return;
 
     view.status = Object.assign({}, view.status, data.message);
-    this.setState({
-      viewsList: this.state.viewsList
-    });
+    this.setState((state) => ({
+      viewsList: state.viewsList
+    }));
   }
 
   sendTabMessage(data) {
@@ -201,10 +194,10 @@ class App extends React.Component {
     if (firstRender) {
       tabInit = new Promise((resolve) => {
         viewFromList.rendered = true;
-        this.setState({
+        this.setState((state) => ({
           activeTabKey: options.noFocus ? undefined : id,
-          viewsList: this.state.viewsList
-        });
+          viewsList: state.viewsList
+        }));
 
         setTimeout(() => {
           // This will have an effect only if Promise is not yet resolved
@@ -219,10 +212,10 @@ class App extends React.Component {
       });
       await tabInit;
     } else {
-      this.setState({
+      this.setState((state) => ({
         activeTabKey: noFocus ? undefined : id,
-        viewsList: this.state.viewsList
-      });
+        viewsList: state.viewsList
+      }));
     }
 
     // always send data on first render

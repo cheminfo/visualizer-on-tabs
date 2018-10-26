@@ -1,19 +1,18 @@
-'use strict';
-
 import lockr from 'lockr';
+
 import { version } from './constants';
 
 const LOCAL_STORAGE_TAB_DATA = 'vweb-';
 const LOCAL_STORAGE_TAB_IDS = 'vweb1-tab-ids';
 const LOCAL_STORAGE_LAST_TAB = 'vweb1-selected-tab';
 
-let storage = {};
+const storage = {};
 
 function isVersionOK(v) {
   return v === undefined || v === version;
 }
 
-storage.save = function(tabId, data) {
+storage.save = function (tabId, data) {
   if (!tabId) return;
   lockr.sadd(LOCAL_STORAGE_TAB_IDS, tabId);
   var key = LOCAL_STORAGE_TAB_DATA + tabId;
@@ -21,16 +20,16 @@ storage.save = function(tabId, data) {
   lockr.set(key, data);
 };
 
-storage.saveSelected = function(tabId) {
+storage.saveSelected = function (tabId) {
   if (!tabId) return;
   lockr.set(LOCAL_STORAGE_LAST_TAB, tabId);
 };
 
-storage.getSelected = function() {
+storage.getSelected = function () {
   return lockr.get(LOCAL_STORAGE_LAST_TAB);
 };
 
-storage.load = function() {
+storage.load = function () {
   var ids = lockr.smembers(LOCAL_STORAGE_TAB_IDS);
   if (!ids) return [];
 
@@ -46,7 +45,7 @@ storage.load = function() {
 
   data = data.filter((entry) => isVersionOK(entry.version));
 
-  data.sort(function(a, b) {
+  data.sort(function (a, b) {
     var idxA = ids.indexOf(a.id);
     var idxB = ids.indexOf(b.id);
     if (idxA < idxB) return -1;
@@ -56,7 +55,7 @@ storage.load = function() {
   return data;
 };
 
-storage.remove = function(id) {
+storage.remove = function (id) {
   lockr.srem(LOCAL_STORAGE_TAB_IDS, id);
   lockr.rm(LOCAL_STORAGE_TAB_DATA + id);
 };

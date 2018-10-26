@@ -1,9 +1,8 @@
-'use strict';
-
 import React from 'react';
 import superagent from 'superagent';
 
 const conf = require('../config/config.js');
+
 const styles = {
   position: 'fixed',
   right: 20,
@@ -14,6 +13,7 @@ class Login extends React.Component {
   constructor() {
     super();
     this.state = {};
+    this.logout = this.logout.bind(this);
     if (!conf.rocLogin) return;
 
     if (conf.rocLogin.urlAbsolute) {
@@ -32,8 +32,9 @@ class Login extends React.Component {
       .get(`${login.url}/auth/session`)
       .withCredentials()
       .end((err, res) => {
-        if (err) console.error('Could not get session', err);
-        else if (res && res.status == 200 && res.body) {
+        if (err) {
+          throw err;
+        } else if (res && res.status === 200 && res.body) {
           if (
             login.auto &&
             (!res.body.authenticated ||
@@ -41,9 +42,10 @@ class Login extends React.Component {
           ) {
             location.href = this.loginUrl;
           }
-          return this.setState({
+          this.setState({
             user: res.body.username
           });
+          return;
         }
         this.setState({
           user: null
@@ -57,8 +59,8 @@ class Login extends React.Component {
       .get(`${conf.rocLogin.url}/auth/logout`)
       .withCredentials()
       .end((err, res) => {
-        if (err) console.error('Could not logout', err);
-        if (res && res.status == 200) {
+        if (err) throw err;
+        if (res && res.status === 200) {
           this.session();
         }
       });
@@ -78,7 +80,7 @@ class Login extends React.Component {
       return (
         <div style={styles}>
           {this.state.user} (
-          <a href="#" onClick={this.logout.bind(this)}>
+          <a href="#" onClick={this.logout}>
             Logout
           </a>
           )
