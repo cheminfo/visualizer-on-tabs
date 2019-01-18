@@ -57,6 +57,12 @@ module.exports = async function (options) {
               ],
               loader: 'babel-loader',
               options: {
+                plugins: [
+                  '@babel/transform-modules-commonjs',
+                  '@babel/transform-async-to-generator',
+                  '@babel/transform-runtime'
+                ],
+                cwd: path.join(__dirname, '..'),
                 presets: [
                   [
                     '@babel/env',

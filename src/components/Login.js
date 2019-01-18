@@ -79,11 +79,11 @@ class Login extends React.Component {
     } else {
       return (
         <div style={styles}>
-          {this.state.user} (
+          {this.state.user}
+          &nbsp;
           <a href="#" onClick={this.logout}>
             Logout
           </a>
-          )
         </div>
       );
     }

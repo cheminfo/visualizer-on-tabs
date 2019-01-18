@@ -258,8 +258,8 @@ describe('docker dev rewrite rules', function () {
 
 function testRewrite(rules) {
   return function (description, input, output) {
-    it(description, function () {
-      expect(rewriteURL(rules, input)).toEqual(output);
+    test(description, function () {
+      expect(rewriteURL(rules, input)).toStrictEqual(output);
     });
   };
 }

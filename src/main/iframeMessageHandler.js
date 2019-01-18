@@ -1,4 +1,4 @@
-import Tabs from '../main/Tabs';
+import Tabs from './Tabs';
 
 export default function iframeMessageHandler(data, [level2]) {
   var prom;
