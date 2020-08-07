@@ -26,7 +26,7 @@
     "iframe-bridge": "^1.1.0",
     "js-yaml": "^3.12.1",
     "lockr": "^0.8.5",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "minimist": "^1.2.3",
     "on-build-webpack": "^0.1.0",
     "react": "^16.7.0",
