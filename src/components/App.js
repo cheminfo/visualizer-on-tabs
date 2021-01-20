@@ -310,7 +310,7 @@ class App extends React.Component {
         if (view.rawIframe) {
           viewPage = (
             <iframe
-              allowFullScreen
+              allow="fullscreen; clipboard-read; clipboard-write;"
               src={view.rewrittenUrl || view.url}
               style={iframeStyle}
             />
