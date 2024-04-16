@@ -7,7 +7,6 @@ const path = require('path');
 const webpack = require('webpack');
 const _ = require('lodash');
 const fs = require('fs-extra');
-const WebpackOnBuildPlugin = require('on-build-webpack');
 
 const defaultOptions = {
   outDir: 'out'
@@ -34,11 +33,6 @@ module.exports = async function (options) {
 
     const prom = [];
     for (const entry of entries) {
-      let _res;
-      var p = new Promise((resolve) => {
-        _res = resolve;
-      });
-      prom.push(p);
       let config = {
         mode: options.debug ? 'development' : 'production',
         entry: path.join(__dirname, '../src', entry.file),
@@ -57,11 +51,7 @@ module.exports = async function (options) {
               ],
               loader: 'babel-loader',
               options: {
-                plugins: [
-                  '@babel/transform-modules-commonjs',
-                  '@babel/transform-async-to-generator',
-                  '@babel/transform-runtime'
-                ],
+                plugins: [],
                 cwd: path.join(__dirname, '..'),
                 presets: [
                   [
@@ -69,8 +59,8 @@ module.exports = async function (options) {
                     {
                       targets: {
                         browsers: [
-                          'chrome >= 54',
-                          'firefox >= 45',
+                          'chrome >= 109', // Last version supported on windows 7
+                          'firefox >= 115',
                           'last 2 edge versions'
                         ]
                       }
@@ -82,26 +72,12 @@ module.exports = async function (options) {
             }
           ]
         },
-        plugins: [
-          new WebpackOnBuildPlugin(function () {
-            console.log('webpack build done');
-            _res();
-          })
-        ],
         watch: options.watch
       };
 
-      webpack(config, function (err, stats) {
-        var jsonStats = stats.toJson();
+      webpack(config, function (err) {
         if (err) {
           throw err;
-        } else if (jsonStats.errors.length > 0) {
-          printErrors(jsonStats.errors);
-          if (!options.watch) {
-            throw Error(`Could not build ${entry.file}`);
-          }
-        } else if (jsonStats.warnings.length > 0) {
-          printErrors(jsonStats.warnings);
         } else {
           console.log(`Build of ${entry.file} successful`);
         }
@@ -129,10 +105,6 @@ module.exports = async function (options) {
       })
     );
   }
-
-  function printErrors(errors) {
-    errors.forEach(function (error) {
-      console.error(error);
-    });
-  }
 };
+
+
