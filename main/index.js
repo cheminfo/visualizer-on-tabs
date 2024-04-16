@@ -51,7 +51,6 @@ module.exports = async function (options) {
               ],
               loader: 'babel-loader',
               options: {
-                plugins: [],
                 cwd: path.join(__dirname, '..'),
                 presets: [
                   [
@@ -59,9 +58,8 @@ module.exports = async function (options) {
                     {
                       targets: {
                         browsers: [
-                          'chrome >= 109', // Last version supported on windows 7
-                          'firefox >= 115',
-                          'last 2 edge versions'
+                          'chrome >= 54', // Last version supported on windows 7
+                          'firefox >= 45',
                         ]
                       }
                     }
@@ -106,3 +104,5 @@ module.exports = async function (options) {
     );
   }
 };
+
+
