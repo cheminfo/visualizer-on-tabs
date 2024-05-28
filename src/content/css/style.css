@@ -3,6 +3,7 @@ html, body, #visualizer-on-tabs, .visualizer-on-tabs-app, .visualizer-on-tabs-sp
     padding: 0;
     width: 100%;
     height: 100%;
+    font-size: 14px;
 }
 
 .visualizer-on-tabs-app {
@@ -32,6 +33,7 @@ html, body, #visualizer-on-tabs, .visualizer-on-tabs-app, .visualizer-on-tabs-sp
 
 .visualizer-on-tabs-content, .tab-content, .tab-content>.active, .visualizer-on-tabs-splash-bg {
     display: flex;
+    flex-direction: column;
     flex: 2;
 }
 
@@ -45,6 +47,11 @@ html, body, #visualizer-on-tabs, .visualizer-on-tabs-app, .visualizer-on-tabs-sp
 
 .visualizer-on-tabs-progress {
     width: 250px;
+}
+
+.close-tab-glyph {
+    font-size: 18px;
+    font-weight: bold;
 }
 
 .close-tab-glyph:hover {

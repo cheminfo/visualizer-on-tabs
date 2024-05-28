@@ -1,19 +1,18 @@
-
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 
 import App from './components/App';
 
-let loc = window.location;
+const loc = window.location;
 let hash = loc.hash.slice(1);
 if (!hash) {
   hash = 'main';
 }
 
-let props = {
+const props = {
   origin: loc.origin,
   path: hash
 };
 
-let element = React.createElement(App, props);
-ReactDOM.render(element, document.getElementById('visualizer-on-tabs'));
+const element = React.createElement(App, props);
+ReactDOM.createRoot(document.getElementById('visualizer-on-tabs')).render(element);
