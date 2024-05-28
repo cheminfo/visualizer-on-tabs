@@ -1,5 +1,4 @@
 import React from 'react';
-import { Glyphicon } from 'react-bootstrap';
 
 class TabTitle extends React.Component {
   constructor(props) {
@@ -18,13 +17,11 @@ class TabTitle extends React.Component {
     var closeHandle;
     if (this.props.onTabClosed) {
       closeHandle = (
-        <span>
-          &nbsp;&nbsp;
-          <Glyphicon
-            className="close-tab-glyph"
-            glyph="remove"
-            onClick={this.onClosedClicked}
-          />
+        <span
+          className="close-tab-glyph"
+          onClick={this.onClosedClicked}
+        >
+          ×
         </span>
       );
     } else {
@@ -32,10 +29,10 @@ class TabTitle extends React.Component {
     }
 
     return (
-      <span title={this.props.textTitle} style={this.props.textStyle}>
+      <div title={this.props.textTitle} style={this.props.textStyle} className="d-flex flex-row gap-2 align-items-baseline">
         {this.props.name}
         {closeHandle}
-      </span>
+      </div>
     );
   }
 }

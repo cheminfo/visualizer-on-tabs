@@ -1,7 +1,8 @@
 import IframeBridge from 'iframe-bridge';
 import React from 'react';
-import Visualizer from 'react-visualizer';
-import { Tabs as BTabs, Tab } from 'react-bootstrap';
+import { OldVisualizer } from 'react-visualizer';
+import Tab from 'react-bootstrap/Tab';
+import BTabs from 'react-bootstrap/Tabs';
 
 import Tabs from '../main/Tabs';
 import iframeMessageHandler from '../main/iframeMessageHandler';
@@ -317,7 +318,7 @@ class App extends React.Component {
           );
         } else {
           viewPage = (
-            <Visualizer
+            <OldVisualizer
               fallbackVersion={conf.visualizerFallbackVersion || 'latest'}
               cdn={conf.visualizerCDN || 'https://www.lactame.com/visualizer'}
               viewURL={view.rewrittenUrl || view.url}
@@ -340,7 +341,7 @@ class App extends React.Component {
               textTitle={saved ? null : 'Not saved'}
               textStyle={textStyle}
               name={view.id}
-              onTabClosed={closable ? this.removeTab.bind(this, view.id) : null}
+              onTabClosed={closable ? () => this.removeTab(view.id) : null}
             />
           }
           key={view.id}
@@ -354,13 +355,12 @@ class App extends React.Component {
     return (
       <div className="visualizer-on-tabs-app">
         <Login />
-        <div className="visualizer-on-tabs-content">
+        <div className="visualizer-on-tabs-content d-flex flex-column">
           <BTabs
             id="visualizer-on-tabs-tab"
-            style={{ flex: 2, display: 'flex', flexFlow: 'column' }}
+            transition={false}
             activeKey={this.state.activeTabKey}
             onSelect={this.onActiveTab}
-            animation={false}
           >
             {arr}
           </BTabs>

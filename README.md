@@ -5,7 +5,7 @@ Builds a static website that has multiple instances of the visualizer that can c
 
 ### Clone visualizer-on-tabs
 
-Clone the github project in your prefered location. In this example let's use /usr/local/node/
+Clone the GitHub project in your preferred location. In this example let's use /usr/local/node/
 
 ```bash
 cd usr/local/node/
