@@ -7,6 +7,9 @@ const path = require('path');
 const webpack = require('webpack');
 const _ = require('lodash');
 const fs = require('fs-extra');
+const { makeVisualizerPage } = require('react-visualizer');
+
+const iframeBridge = require('./iframe-bridge');
 
 const defaultOptions = {
   outDir: 'out'
@@ -25,7 +28,8 @@ module.exports = async function (options) {
   const confPath = path.join(__dirname, '../src/config/custom.json');
   await fs.writeFile(confPath, JSON.stringify(options.config));
   await Promise.all([buildApp(), copyContent()]);
-  await addIndex(options);
+  await addIndex(outDir, options);
+  await addVisualizer(outDir, options);
   return fs.unlink(confPath);
 
   function buildApp() {
@@ -88,21 +92,36 @@ module.exports = async function (options) {
   function copyContent() {
     return fs.copy(path.join(__dirname, '../src/content'), outDir);
   }
-
-  async function addIndex() {
-    const content = await fs.readFile(
-      path.join(__dirname, '../src/template/index.html'),
-      'utf8'
-    );
-    const tpl = _.template(content);
-    return fs.writeFile(
-      path.join(outDir, 'index.html'),
-      tpl({
-        title: options.config.title,
-        uniqid: Date.now()
-      })
-    );
-  }
 };
 
 
+async function addIndex(outDir, options) {
+  const content = await fs.readFile(
+    path.join(__dirname, '../src/template/index.html'),
+    'utf8'
+  );
+  const tpl = _.template(content);
+  return fs.writeFile(
+    path.join(outDir, 'index.html'),
+    tpl({
+      title: options.config.title,
+      uniqid: Date.now()
+    })
+  );
+}
+
+async function addVisualizer(outDir, options) {
+  const page = makeVisualizerPage({
+    cdn: options.visualizerCDN,
+    fallbackVersion: options.visualizerFallbackVersion,
+    scripts: [
+      {
+        url: iframeBridge
+      }
+    ]
+  });
+  return fs.writeFile(
+    path.join(outDir, 'visualizer.html'),
+    page,
+  );
+}

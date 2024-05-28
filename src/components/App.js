@@ -1,12 +1,11 @@
 import IframeBridge from 'iframe-bridge';
 import React from 'react';
-import { OldVisualizer } from 'react-visualizer';
+import { Visualizer } from 'react-visualizer';
 import Tab from 'react-bootstrap/Tab';
 import BTabs from 'react-bootstrap/Tabs';
 
 import Tabs from '../main/Tabs';
 import iframeMessageHandler from '../main/iframeMessageHandler';
-import iframeBridge from '../main/iframe-bridge';
 import tabStorage from '../main/tabStorage';
 import { rewriteURL } from '../util';
 
@@ -318,15 +317,13 @@ class App extends React.Component {
           );
         } else {
           viewPage = (
-            <OldVisualizer
-              fallbackVersion={conf.visualizerFallbackVersion || 'latest'}
-              cdn={conf.visualizerCDN || 'https://www.lactame.com/visualizer'}
+            <Visualizer
+              url="visualizer.html"
               viewURL={view.rewrittenUrl || view.url}
               version={
                 this.visualizerVersion || conf.visualizerVersion || 'auto'
               }
               config={conf.visualizerConfig}
-              scripts={[iframeBridge]}
               style={iframeStyle}
             />
           );
