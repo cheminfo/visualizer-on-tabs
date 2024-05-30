@@ -52,6 +52,7 @@ html, body, #visualizer-on-tabs, .visualizer-on-tabs-app, .visualizer-on-tabs-sp
 .close-tab-glyph {
     font-size: 18px;
     font-weight: bold;
+    line-height: 0;
 }
 
 .close-tab-glyph:hover {
