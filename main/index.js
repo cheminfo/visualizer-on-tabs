@@ -37,6 +37,13 @@ module.exports = async function (options) {
 
     const prom = [];
     for (const entry of entries) {
+      let resolve;
+      let reject;
+      var p = new Promise((_resolve, _reject) => {
+        resolve = _resolve;
+        reject = _reject;
+      });
+      prom.push(p);
       let config = {
         mode: options.debug ? 'development' : 'production',
         entry: path.join(__dirname, '../src', entry.file),
@@ -79,9 +86,10 @@ module.exports = async function (options) {
 
       webpack(config, function (err) {
         if (err) {
-          throw err;
+          reject(err);
         } else {
           console.log(`Build of ${entry.file} successful`);
+          resolve();
         }
       });
     }

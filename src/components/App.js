@@ -1,13 +1,13 @@
 import IframeBridge from 'iframe-bridge';
 import React from 'react';
-import { Visualizer } from 'react-visualizer';
+import {Visualizer} from 'react-visualizer';
 import Tab from 'react-bootstrap/Tab';
 import BTabs from 'react-bootstrap/Tabs';
 
 import Tabs from '../main/Tabs';
 import iframeMessageHandler from '../main/iframeMessageHandler';
 import tabStorage from '../main/tabStorage';
-import { rewriteURL } from '../util';
+import {rewriteURL} from '../util';
 
 import Login from './Login';
 import TabTitle from './TabTitle';
