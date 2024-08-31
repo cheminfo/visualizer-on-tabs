@@ -28,7 +28,7 @@
     "react-dom": "^18.3.1",
     "react-visualizer": "^3.0.1",
     "superagent": "^4.1.0",
-    "webpack": "^5.91.0"
+    "webpack": "^5.94.0"
   },
   "main": "main/index.js",
   "devDependencies": {
