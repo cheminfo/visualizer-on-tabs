@@ -1,13 +1,13 @@
 import IframeBridge from 'iframe-bridge';
 import React from 'react';
-import {Visualizer} from 'react-visualizer';
+import { Visualizer } from 'react-visualizer';
 import Tab from 'react-bootstrap/Tab';
 import BTabs from 'react-bootstrap/Tabs';
 
 import Tabs from '../main/Tabs';
 import iframeMessageHandler from '../main/iframeMessageHandler';
 import tabStorage from '../main/tabStorage';
-import {rewriteURL} from '../util';
+import { rewriteURL } from '../util';
 
 import Login from './Login';
 import TabTitle from './TabTitle';
@@ -174,7 +174,7 @@ class App extends React.Component {
     const sameTab = this.state.activeTabKey === id;
     if (sameTab && !options.force) return;
 
-    const noFocus = options.noFocus;
+    const focusedTabId = options.noFocus ? undefined : id;
     let viewFromList = this.state.viewsList.find((el) => el.id === id);
     const newTab = !viewFromList;
     const viewInfo = possibleViews[id];
@@ -191,7 +191,7 @@ class App extends React.Component {
       this.state.viewsList.push(viewFromList);
     }
     const firstRender =
-      (options.load || !noFocus) && (newTab || !viewFromList.rendered);
+      (options.load || !options.noFocus) && (newTab || !viewFromList.rendered);
     await tabInit;
     // First render means we expect the render function to initialize a new iframe
     // We need to get the IframeBridge ID of that frame and prevent any other iframes
@@ -200,7 +200,7 @@ class App extends React.Component {
       tabInit = new Promise((resolve) => {
         viewFromList.rendered = true;
         this.setState((state) => ({
-          activeTabKey: options.noFocus ? undefined : id,
+          activeTabKey: focusedTabId,
           viewsList: state.viewsList
         }));
 
@@ -218,7 +218,7 @@ class App extends React.Component {
       await tabInit;
     } else {
       this.setState((state) => ({
-        activeTabKey: noFocus ? undefined : id,
+        activeTabKey: focusedTabId,
         viewsList: state.viewsList
       }));
     }
@@ -232,7 +232,7 @@ class App extends React.Component {
       tabStorage.saveSelected(id);
     }
     if (!options.noFocusEvent && !sameTab) {
-      this.sendTabFocusEvent();
+      this.sendTabFocusEvent(focusedTabId);
     }
   }
 
@@ -277,8 +277,7 @@ class App extends React.Component {
     });
   }
 
-  sendTabFocusEvent() {
-    const key = this.state.activeTabKey;
+  sendTabFocusEvent(key) {
     if (possibleViews[key]) {
       IframeBridge.postMessage('tab.focus', {}, possibleViews[key].windowID);
     }
