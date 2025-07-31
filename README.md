@@ -1,18 +1,21 @@
 # visualizer-on-tabs
 Builds a static website that has multiple instances of the visualizer that can communicate with each other.
 
-## Install and configure visualizer-on-tabs
+## Dev setup
 
-### Clone visualizer-on-tabs
+Here is how you can test your changes in the visualizer-on-tabs project.
 
-Clone the GitHub project in your preferred location. In this example let's use /usr/local/node/
+### Build the page with a custom configuration
 
 ```bash
-cd usr/local/node/
-git clone https://github.com/cheminfo/visualizer-on-tabs.git
-cd visualizer-on-tabs
-npm install
+npm run dev
 ```
+
+This will build the project and serve the generated app.
+
+If you make changes to the source code, you need to stop the server and re-run the command.
+
+## Install and configure visualizer-on-tabs
 
 ### Choose your configuration
 
