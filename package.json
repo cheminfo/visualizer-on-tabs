@@ -5,6 +5,7 @@
   "scripts": {
     "clean": "shx rm -rf out",
     "copy-static": "shx mkdir -p out && shx cp -r src/content/* out",
+    "dev": "node bin/build.js --debug=1 --config=./dev.json && npx serve out/",
     "eslint": "eslint bin main src",
     "webpack": "node bin/build.js --debug=1",
     "watch": "npm run copy-static && npm run webpack -- --watch",

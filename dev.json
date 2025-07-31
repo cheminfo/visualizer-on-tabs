@@ -1,0 +1,22 @@
+{
+  "//": "Dev configuration for testing visualizer-on-tabs locally",
+  "possibleViews": {
+    "Home": {
+      "url": "https://couch.cheminfo.org/cheminfo-public/158ef2f0cc85bfc5b4f2d88cff473e83/view.json"
+    }
+  },
+  "rewriteRules": [
+    {
+      "reg": "^([a-z0-9]+)\\?(.*)$",
+      "replace": "https://couch.cheminfo.org/cheminfo-public/$1/view.json?$2"
+    },
+    {
+      "reg": "^[a-z0-9]+$",
+      "replace": "https://couch.cheminfo.org/cheminfo-public/$&/view.json"
+    },
+    {
+      "reg": "^[a-z0-9]+/view.json\\?.*",
+      "replace": "https://couch.cheminfo.org/cheminfo-public/$&"
+    }
+  ]
+}
