@@ -1,4 +1,7 @@
-import { rewriteURL } from '../util';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
+
+import { rewriteURL } from './util.js';
 
 const devRules = [
   [
@@ -258,8 +261,8 @@ describe('docker dev rewrite rules', () => {
 
 function testRewrite(rules) {
   return (description, input, output) => {
-    test(description, () => {
-      expect(rewriteURL(rules, input)).toStrictEqual(output);
+    it(description, () => {
+      assert.strictEqual(rewriteURL(rules, input), output);
     });
   };
 }
