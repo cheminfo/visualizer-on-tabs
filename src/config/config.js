@@ -1,21 +1,18 @@
-'use strict';
+import defaultConfig from './default';
 
-const defaultConfig = require('./default');
-
-const customConfig = getCustomConfig();
-
-function getCustomConfig() {
+async function getCustomConfig() {
   try {
-    // eslint-disable-next-line import/no-unresolved
-    return require('./custom.json');
-  } catch (e) {
+    await import('./custom.json', { assert: { type: 'json' } });
+  } catch {
     return {};
   }
 }
 
-var config = Object.assign({}, defaultConfig, customConfig);
-if (config.rocLogin && config.rocLogin.url) {
-  // Remove trailing slash
-  config.rocLogin.url = config.rocLogin.url.replace(/\/$/, '');
+export async function getConfig() {
+  const customConfig = await getCustomConfig();
+  const config = { ...defaultConfig, ...customConfig };
+  if (config.rocLogin && config.rocLogin.url) {
+    // Remove trailing slash
+    config.rocLogin.url = config.rocLogin.url.replace(/\/$/, '');
+  }
 }
-module.exports = config;

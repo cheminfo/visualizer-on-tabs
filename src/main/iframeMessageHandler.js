@@ -1,7 +1,7 @@
 import Tabs from './Tabs';
 
 export default function iframeMessageHandler(data, [level2]) {
-  var prom;
+  let prom;
   switch (level2) {
     case 'open':
       Tabs.openTab(data.message);
@@ -27,12 +27,16 @@ export default function iframeMessageHandler(data, [level2]) {
   prom.then(
     (message) => {
       data.message = message.data;
+      // the iframeMessageHandler callback's `this` is bound by the iframe-bridge library
+      // eslint-disable-next-line no-invalid-this
       this.postMessage(data);
     },
     (error) => {
       data.status = 'error';
       data.message = error;
+      // the iframeMessageHandler callback's `this` is bound by the iframe-bridge library
+      // eslint-disable-next-line no-invalid-this
       this.postMessage(data);
-    }
+    },
   );
 }

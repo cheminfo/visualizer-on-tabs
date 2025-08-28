@@ -11,8 +11,10 @@ if (!hash) {
 
 const props = {
   origin: loc.origin,
-  path: hash
+  path: hash,
 };
 
 const element = React.createElement(App, props);
-ReactDOM.createRoot(document.getElementById('visualizer-on-tabs')).render(element);
+ReactDOM.createRoot(document.getElementById('visualizer-on-tabs')).render(
+  element,
+);

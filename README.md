@@ -1,4 +1,5 @@
 # visualizer-on-tabs
+
 Builds a static website that has multiple instances of the visualizer that can communicate with each other.
 
 ## Dev setup
@@ -31,7 +32,8 @@ Now you try it in: www.myserver.com/on-tabs/
 
 ### Configure a flavor to deploy on-tabs
 
-Edit the `flavorLayouts`(/usr/local/flavor-builder/config.json) to specify a deployment method for your flavor. For this, you need to add a new entry which key is your flavor name and value is `visualizer-on-tabs`. Example: 
+Edit the `flavorLayouts`(/usr/local/flavor-builder/config.json) to specify a deployment method for your flavor. For this, you need to add a new entry which key is your flavor name and value is `visualizer-on-tabs`. Example:
+
 ```
 ...
 "flavorLayouts": {
@@ -40,6 +42,7 @@ Edit the `flavorLayouts`(/usr/local/flavor-builder/config.json) to specify a dep
   }
   ...
 ```
+
 Add a new rewriteRule
 
 ```
@@ -54,6 +57,5 @@ Add a new rewriteRule
     }
     ...
 ```
+
 You would need to edit a view in this flavor, or launch the build manually with the `--forceUpdate` option.
-
-

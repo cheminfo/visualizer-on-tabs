@@ -1,135 +1,129 @@
-'use strict';
+import path from 'node:path';
+import { fileURLToPath } from 'url';
 
-/* eslint-disable no-console */
+import fs from 'fs-extra';
+import _ from 'lodash';
+import { makeVisualizerPage } from 'react-visualizer';
+import webpack from 'webpack';
 
-const path = require('path');
+import iframeBridge from './iframe-bridge';
 
-const webpack = require('webpack');
-const _ = require('lodash');
-const fs = require('fs-extra');
-const { makeVisualizerPage } = require('react-visualizer');
-
-const iframeBridge = require('./iframe-bridge');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const defaultOptions = {
-  outDir: 'out'
+  outDir: 'out',
 };
 
 const defaultConfig = {
-  title: 'visualizer-on-tabs'
+  title: 'visualizer-on-tabs',
 };
 
-module.exports = async function (options) {
-  options = Object.assign({}, defaultOptions, options);
-  options.config = Object.assign({}, defaultConfig, options.config);
-
-  const outDir = path.resolve(__dirname, '..', options.outDir);
-
-  const confPath = path.join(__dirname, '../src/config/custom.json');
-  await fs.writeFile(confPath, JSON.stringify(options.config));
-  await Promise.all([buildApp(), copyContent()]);
-  await addIndex(outDir, options);
-  await addVisualizer(outDir, options);
-  return fs.unlink(confPath);
-
-  function buildApp() {
-    const entries = [{ file: 'app.js' }];
-
-    const prom = [];
-    for (const entry of entries) {
-      let resolve;
-      let reject;
-      var p = new Promise((_resolve, _reject) => {
-        resolve = _resolve;
-        reject = _reject;
-      });
-      prom.push(p);
-      let config = {
-        mode: options.debug ? 'development' : 'production',
-        entry: path.join(__dirname, '../src', entry.file),
-        output: {
-          path: outDir,
-          filename: entry.file
-        },
-        devtool: 'source-map',
-        module: {
-          rules: [
-            {
-              test: /\.js$/,
-              include: [
-                path.resolve(__dirname, '../src'),
-                path.resolve(__dirname, '../node_modules/iframe-bridge')
+const buildApp = (options, outDir) => {
+  const entries = [{ file: 'app.js' }];
+  const prom = [];
+  for (const entry of entries) {
+    let resolve;
+    let reject;
+    let p = new Promise((_resolve, _reject) => {
+      resolve = _resolve;
+      reject = _reject;
+    });
+    prom.push(p);
+    let config = {
+      mode: options.debug ? 'development' : 'production',
+      entry: path.join(__dirname, '../src', entry.file),
+      output: {
+        path: outDir,
+        filename: entry.file,
+      },
+      devtool: 'source-map',
+      module: {
+        rules: [
+          {
+            test: /\.js$/,
+            include: [
+              path.resolve(__dirname, '../src'),
+              path.resolve(__dirname, '../node_modules/iframe-bridge'),
+            ],
+            loader: 'babel-loader',
+            options: {
+              cwd: path.join(__dirname, '..'),
+              presets: [
+                [
+                  '@babel/env',
+                  {
+                    targets: {
+                      browsers: ['chrome >= 54', 'firefox >= 45'],
+                    },
+                  },
+                ],
+                '@babel/react',
               ],
-              loader: 'babel-loader',
-              options: {
-                cwd: path.join(__dirname, '..'),
-                presets: [
-                  [
-                    '@babel/env',
-                    {
-                      targets: {
-                        browsers: [
-                          'chrome >= 54', // Last version supported on windows 7
-                          'firefox >= 45',
-                        ]
-                      }
-                    }
-                  ],
-                  '@babel/react'
-                ]
-              }
-            }
-          ]
-        },
-        watch: options.watch
-      };
+            },
+          },
+        ],
+      },
+      watch: options.watch,
+    };
 
-      webpack(config, function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          console.log(`Build of ${entry.file} successful`);
-          resolve();
-        }
-      });
-    }
-
-    return Promise.all(prom);
+    webpack(config, function handleError(err) {
+      if (err) {
+        reject(err);
+      } else {
+        // TODO: use node's util.debuglog here and in flavor-builder
+        // eslint-disable-next-line no-console
+        console.log(`Build of ${entry.file} successful`);
+        resolve();
+      }
+    });
   }
 
-  function copyContent() {
-    return fs.copy(path.join(__dirname, '../src/content'), outDir);
-  }
+  return Promise.all(prom);
 };
 
+const copyContent = (outDir) => {
+  return fs.copy(path.join(__dirname, '../src/content'), outDir);
+};
 
-async function addIndex(outDir, options) {
+const addIndex = async (outDir, options) => {
   const content = await fs.readFile(
     path.join(__dirname, '../src/template/index.html'),
-    'utf8'
+    'utf8',
   );
   const tpl = _.template(content);
   return fs.writeFile(
     path.join(outDir, 'index.html'),
     tpl({
       title: options.config.title,
-      uniqid: Date.now()
-    })
+      uniqid: Date.now(),
+    }),
   );
-}
+};
 
-async function addVisualizer(outDir, options) {
+const addVisualizer = async (outDir, options) => {
   const page = makeVisualizerPage({
     cdn: options.visualizerCDN,
     fallbackVersion: options.visualizerFallbackVersion,
     scripts: [
       {
-        url: iframeBridge
-      }
-    ]
+        url: iframeBridge,
+      },
+    ],
   });
-  return fs.writeFile(
-    path.join(outDir, 'visualizer.html'),
-    page,
-  );
-}
+  return fs.writeFile(path.join(outDir, 'visualizer.html'), page);
+};
+
+export default async (options) => {
+  options = { ...defaultOptions, ...options };
+  options.config = { ...defaultConfig, ...options.config };
+
+  const outDir = path.resolve(__dirname, '..', options.outDir);
+
+  const confPath = path.join(__dirname, '../src/config/custom.json');
+  await fs.writeFile(confPath, JSON.stringify(options.config));
+  await Promise.all([buildApp(options, outDir), copyContent(outDir)]);
+  await addIndex(outDir, options);
+  await addVisualizer(outDir, options);
+  return fs.unlink(confPath);
+};

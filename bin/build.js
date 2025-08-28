@@ -2,15 +2,16 @@
 
 /* eslint-disable no-console */
 
-'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
 
-const path = require('path');
-const fs = require('fs');
+import yaml from 'js-yaml';
+import minimist from 'minimist';
 
-const yaml = require('js-yaml');
-const argv = require('minimist')(process.argv.slice(2));
+import build from '..';
 
-const build = require('..');
+const argv = minimist(process.argv.slice(2));
 
 const options = {};
 if (argv.watch) options.watch = argv.watch;
@@ -18,17 +19,19 @@ if (argv.outDir) options.outDir = argv.outDir;
 if (argv.debug) options.debug = argv.debug;
 
 if (argv.config) {
-  const configFile = path.resolve(path.join(__dirname, '..'), argv.config);
+  const configFile = path.resolve(
+    path.join(import.meta.dirname, '..'),
+    argv.config,
+  );
   options.config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'), {
-    filename: configFile
+    filename: configFile,
   });
 }
 
-build(options)
-  .then(function () {
-    console.log('Build succeeded');
-  })
-  .catch(function (e) {
-    console.log(e.message, e.stack);
-    console.error('Build failed');
-  });
+try {
+  await build(options);
+  console.log('Build succeeded');
+} catch (e) {
+  console.log(e.message, e.stack);
+  console.error('Build failed');
+}

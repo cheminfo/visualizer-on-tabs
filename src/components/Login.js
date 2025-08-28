@@ -1,33 +1,34 @@
 import React from 'react';
 import superagent from 'superagent';
 
-const conf = require('../config/config.js');
-
 const styles = {
   position: 'fixed',
   right: 20,
-  top: 10
+  top: 10,
 };
 
 class Login extends React.Component {
-  constructor() {
+  config = {};
+  constructor(config) {
     super();
     this.state = {};
+    this.config = config;
     this.logout = this.logout.bind(this);
-    if (!conf.rocLogin) return;
+    if (!config.rocLogin) return;
 
-    if (conf.rocLogin.urlAbsolute) {
-      this.loginUrl = conf.rocLogin.urlAbsolute;
+    if (config.rocLogin.urlAbsolute) {
+      this.loginUrl = config.rocLogin.urlAbsolute;
     } else {
-      this.loginUrl = `${conf.rocLogin.url}/auth/login?continue=${conf.rocLogin
-        .redirect || location.href}`;
+      this.loginUrl = `${config.rocLogin.url}/auth/login?continue=${
+        config.rocLogin.redirect || window.location.href
+      }`;
     }
     this.session();
   }
 
   session() {
-    if (!conf.rocLogin) return;
-    const login = conf.rocLogin;
+    if (!this.config.rocLogin) return;
+    const login = this.config.rocLogin;
     superagent
       .get(`${login.url}/auth/session`)
       .withCredentials()
@@ -40,34 +41,32 @@ class Login extends React.Component {
             (!res.body.authenticated ||
               (login.user && res.body.username !== login.user))
           ) {
-            location.href = this.loginUrl;
+            window.location.href = this.loginUrl;
           }
           this.setState({
-            user: res.body.username
+            user: res.body.username,
           });
           return;
         }
         this.setState({
-          user: null
+          user: null,
         });
       });
   }
 
-  logout() {
-    if (!conf.rocLogin) return;
-    superagent
-      .get(`${conf.rocLogin.url}/auth/logout`)
-      .withCredentials()
-      .end((err, res) => {
-        if (err) throw err;
-        if (res && res.status === 200) {
-          this.session();
-        }
-      });
+  async logout() {
+    if (!this.config.rocLogin) return;
+    const response = await fetch(`${this.config.rocLogin.url}/auth/logout`, {
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      throw new Error(`Unexpected logout response: ${response.statusText}`);
+    }
+    this.session();
   }
 
   render() {
-    if (!conf.rocLogin) {
+    if (!this.config.rocLogin) {
       return <div />;
     }
     if (!this.state.user || this.state.user === 'anonymous') {
