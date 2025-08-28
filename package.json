@@ -4,6 +4,7 @@
   "description": "",
   "type": "module",
   "module": "main/index.js",
+  "sideEffects": false,
   "scripts": {
     "clean": "shx rm -rf out",
     "copy-static": "shx mkdir -p out && shx cp -r src/content/* out",

@@ -3,10 +3,10 @@ import { fileURLToPath } from 'url';
 
 import fs from 'fs-extra';
 import _ from 'lodash';
-import { makeVisualizerPage } from 'react-visualizer';
+import visualizer from 'react-visualizer';
 import webpack from 'webpack';
 
-import iframeBridge from './iframe-bridge';
+import iframeBridge from './iframe-bridge.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -102,7 +102,7 @@ const addIndex = async (outDir, options) => {
 };
 
 const addVisualizer = async (outDir, options) => {
-  const page = makeVisualizerPage({
+  const page = visualizer.makeVisualizerPage({
     cdn: options.visualizerCDN,
     fallbackVersion: options.visualizerFallbackVersion,
     scripts: [

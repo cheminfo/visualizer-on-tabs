@@ -9,7 +9,7 @@ import process from 'node:process';
 import yaml from 'js-yaml';
 import minimist from 'minimist';
 
-import build from '..';
+import build from '../main/index.js';
 
 const argv = minimist(process.argv.slice(2));
 

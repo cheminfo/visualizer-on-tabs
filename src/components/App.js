@@ -2,18 +2,17 @@
 
 import IframeBridge from 'iframe-bridge';
 import React from 'react';
-import Tab from 'react-bootstrap/Tab';
-import BTabs from 'react-bootstrap/Tabs';
+import { Tab, Tabs as BTabs } from 'react-bootstrap';
 import { Visualizer } from 'react-visualizer';
 
 import { getConfig } from '../config/config.js';
-import Tabs from '../main/Tabs';
-import iframeMessageHandler from '../main/iframeMessageHandler';
-import * as tabStorage from '../main/tabStorage';
-import { rewriteURL } from '../util';
+import Tabs from '../main/Tabs.js';
+import iframeMessageHandler from '../main/iframeMessageHandler.js';
+import * as tabStorage from '../main/tabStorage.js';
+import { rewriteURL } from '../util.js';
 
-import Login from './Login';
-import TabTitle from './TabTitle';
+import Login from './Login.js';
+import TabTitle from './TabTitle.js';
 
 let tabInit = Promise.resolve();
 let currentIframe;
@@ -30,6 +29,7 @@ const pageQueryParameters = (() => {
 const iframeStyle = { position: 'static', flex: 2, border: 'none' };
 
 class App extends React.Component {
+  config = {};
   constructor(props) {
     super(props);
     this.onActiveTab = this.onActiveTab.bind(this);
@@ -72,15 +72,15 @@ class App extends React.Component {
     };
 
     this.loadConfig().then(() => this.loadTabs());
-    this.loadTabs();
   }
 
   async loadConfig() {
     const config = await getConfig();
+    this.config = config;
     this.setState((state) => {
-      state.config = config;
-      state.isConfigLoaded = false;
+      state.isConfigLoaded = true;
     });
+    return config;
   }
   async loadTabs() {
     let firstTab;
@@ -168,7 +168,7 @@ class App extends React.Component {
       this.config.possibleViews[obj.id].data = obj.data;
     }
 
-    if (this.state.config.rewriteRules) {
+    if (this.config.rewriteRules) {
       let newURL = rewriteURL(
         this.config.rewriteRules,
         this.config.possibleViews[obj.id].url,
@@ -371,7 +371,7 @@ class App extends React.Component {
 
     return (
       <div className="visualizer-on-tabs-app">
-        <Login config={this.state.config} />
+        <Login config={this.config} />
         <div className="visualizer-on-tabs-content d-flex flex-column">
           <BTabs
             id="visualizer-on-tabs-tab"

@@ -1,6 +1,6 @@
 import lockr from 'lockr';
 
-import { version } from './constants';
+import { version } from './constants.js';
 
 const LOCAL_STORAGE_TAB_DATA = 'vweb-';
 const LOCAL_STORAGE_TAB_IDS = 'vweb1-tab-ids';

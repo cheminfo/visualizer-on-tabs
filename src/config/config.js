@@ -1,4 +1,4 @@
-import defaultConfig from './default';
+import defaultConfig from './default.js';
 
 async function getCustomConfig() {
   try {
@@ -15,4 +15,5 @@ export async function getConfig() {
     // Remove trailing slash
     config.rocLogin.url = config.rocLogin.url.replace(/\/$/, '');
   }
+  return config;
 }
