@@ -2,7 +2,8 @@
 
 import IframeBridge from 'iframe-bridge';
 import React from 'react';
-import { Tab, Tabs as BTabs } from 'react-bootstrap';
+import Tab from 'react-bootstrap/Tab';
+import BTabs from 'react-bootstrap/Tabs';
 import { Visualizer } from 'react-visualizer';
 
 import { getConfig } from '../config/config.js';

@@ -5,6 +5,9 @@
   "type": "module",
   "module": "main/index.js",
   "sideEffects": false,
+  "browserslist": [
+    "defaults"
+  ],
   "scripts": {
     "clean": "shx rm -rf out",
     "copy-static": "shx mkdir -p out && shx cp -r src/content/* out",
@@ -18,10 +21,10 @@
     "test": "node --test && npm run eslint"
   },
   "dependencies": {
-    "@babel/core": "^7.24.4",
-    "@babel/preset-env": "^7.24.4",
-    "@babel/preset-react": "^7.24.1",
-    "babel-loader": "^9.1.3",
+    "@babel/core": "^7.28.3",
+    "@babel/preset-env": "^7.28.3",
+    "@babel/preset-react": "^7.27.1",
+    "babel-loader": "^10.0.0",
     "bootstrap": "^5.3.3",
     "fs-extra": "^7.0.1",
     "iframe-bridge": "^1.1.0",
@@ -30,7 +33,7 @@
     "lodash": "^4.17.21",
     "minimist": "^1.2.6",
     "react": "^18.3.1",
-    "react-bootstrap": "^2.10.2",
+    "react-bootstrap": "^3.0.0-beta.3",
     "react-dom": "^18.3.1",
     "react-visualizer": "^3.0.1",
     "superagent": "^4.1.0",
