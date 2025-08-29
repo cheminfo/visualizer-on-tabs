@@ -49,17 +49,7 @@ const buildApp = (options, outDir) => {
             loader: 'babel-loader',
             options: {
               cwd: path.join(__dirname, '..'),
-              presets: [
-                [
-                  '@babel/env',
-                  {
-                    targets: {
-                      browsers: ['chrome >= 54', 'firefox >= 45'],
-                    },
-                  },
-                ],
-                '@babel/react',
-              ],
+              presets: ['@babel/env', '@babel/react'],
             },
           },
         ],
