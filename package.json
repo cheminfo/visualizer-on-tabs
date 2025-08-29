@@ -9,16 +9,18 @@
     "defaults"
   ],
   "scripts": {
-    "clean": "shx rm -rf out",
+    "build": "npm run clean && npm run webpack",
+    "build:dev": "node bin/build.js --debug=1 --config=./dev.json",
+    "clean": "rimraf out",
     "copy-static": "shx mkdir -p out && shx cp -r src/content/* out",
-    "dev": "node bin/build.js --debug=1 --config=./dev.json && npx serve out/",
+    "dev": "npm run build:dev && npm run serve",
+    "eslint": "eslint bin main src",
     "prettier": "prettier --check ./",
     "prettier-write": "prettier --write ./",
-    "eslint": "eslint bin main src",
+    "serve": "npx serve out/",
+    "test": "node --test && npm run eslint",
     "webpack": "node bin/build.js --debug=1",
-    "watch": "npm run copy-static && npm run webpack -- --watch",
-    "build": "npm run clean && npm run webpack",
-    "test": "node --test && npm run eslint"
+    "watch": "npm run copy-static && npm run webpack -- --watch"
   },
   "dependencies": {
     "@babel/core": "^7.28.3",
@@ -43,7 +45,7 @@
     "eslint": "^9.34.0",
     "eslint-config-zakodium": "^16.0.0",
     "prettier": "^3.6.2",
-    "shx": "^0.3.2"
+    "rimraf": "^6.0.1"
   },
   "volta": {
     "node": "20.12.2"
