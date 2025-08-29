@@ -1,5 +1,4 @@
 import React from 'react';
-import superagent from 'superagent';
 
 const styles = {
   position: 'fixed',
@@ -23,35 +22,31 @@ class Login extends React.Component {
         config.rocLogin.redirect || window.location.href
       }`;
     }
-    this.session();
+    void this.session();
   }
 
-  session() {
+  async session() {
     if (!this.config.rocLogin) return;
     const login = this.config.rocLogin;
-    superagent
-      .get(`${login.url}/auth/session`)
-      .withCredentials()
-      .end((err, res) => {
-        if (err) {
-          throw err;
-        } else if (res && res.status === 200 && res.body) {
-          if (
-            login.auto &&
-            (!res.body.authenticated ||
-              (login.user && res.body.username !== login.user))
-          ) {
-            window.location.href = this.loginUrl;
-          }
-          this.setState({
-            user: res.body.username,
-          });
-          return;
-        }
-        this.setState({
-          user: null,
-        });
+    const response = await fetch(`${login.url}/auth/session`, {
+      credentials: 'include',
+    });
+    if (response.ok) {
+      const body = await response.json();
+      if (
+        login.auto &&
+        (!body.authenticated || (login.user && body.username !== login.user))
+      ) {
+        window.location.href = this.loginUrl;
+      }
+      this.setState({
+        user: body.username,
       });
+    } else {
+      this.setState({
+        user: null,
+      });
+    }
   }
 
   async logout() {
