@@ -17,7 +17,7 @@
     "prettier": "prettier --check ./",
     "prettier-write": "prettier --write ./",
     "serve": "npx serve out/",
-    "test": "node --test && npm run eslint",
+    "test": "node --test && npm run eslint && npm run prettier",
     "watch": "npm run copy-static && npm run webpack -- --watch"
   },
   "dependencies": {
