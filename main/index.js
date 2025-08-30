@@ -21,7 +21,7 @@ const buildApp = (options, outDir, cleanup) => {
   const entries = [{ file: 'app.js' }];
   for (const entry of entries) {
     let config = {
-      mode: options.debug ? 'development' : 'production',
+      mode: options.mode === 'development' ? 'development' : 'production',
       context: path.resolve(__dirname, '../'),
       entry: path.resolve(__dirname, '../src', entry.file),
       output: {
@@ -88,42 +88,8 @@ const buildApp = (options, outDir, cleanup) => {
   }
 };
 
-const copyContent = (outDir) => {
-  return fs.cp(path.join(__dirname, '../src/content'), outDir, {
-    recursive: true,
-  });
-};
-
-const addIndex = async (outDir, options) => {
-  const content = await fs.readFile(
-    path.join(__dirname, '../src/template/index.html'),
-    'utf8',
-  );
-  const tpl = _.template(content);
-  return fs.writeFile(
-    path.join(outDir, 'index.html'),
-    tpl({
-      title: options.config.title,
-      uniqid: Date.now(),
-    }),
-  );
-};
-
-const addVisualizer = async (outDir, options) => {
-  const page = visualizer.makeVisualizerPage({
-    cdn: options.visualizerCDN,
-    fallbackVersion: options.visualizerFallbackVersion,
-    scripts: [
-      {
-        url: iframeBridge,
-      },
-    ],
-  });
-  return fs.writeFile(path.join(outDir, 'visualizer.html'), page);
-};
-
 export default async (options) => {
-  options.config = { ...defaultConfig, ...options.config };
+  Object.assign(options.config, defaultConfig);
 
   const outDir = path.resolve(options.outDir);
   await fs.mkdir(outDir, { recursive: true });
@@ -132,9 +98,9 @@ export default async (options) => {
   console.log('Copying files');
   await Promise.all([
     fs.writeFile(confPath, JSON.stringify(options.config)),
-    copyContent(outDir),
-    addIndex(outDir, options),
-    addVisualizer(outDir, options),
+    copyContent(options),
+    addIndex(options),
+    addVisualizer(options),
   ]);
 
   async function cleanup() {
@@ -148,3 +114,37 @@ export default async (options) => {
 
   return cleanup;
 };
+
+function copyContent(options) {
+  return fs.cp(path.join(__dirname, '../src/content'), options.outDir, {
+    recursive: true,
+  });
+}
+
+async function addIndex(options) {
+  const content = await fs.readFile(
+    path.join(__dirname, '../src/template/index.html'),
+    'utf8',
+  );
+  const tpl = _.template(content);
+  return fs.writeFile(
+    path.join(options.outDir, 'index.html'),
+    tpl({
+      title: options.config.title,
+      uniqid: Date.now(),
+    }),
+  );
+}
+
+function addVisualizer(options) {
+  const page = visualizer.makeVisualizerPage({
+    cdn: options.config.visualizerCDN,
+    fallbackVersion: options.config.visualizerFallbackVersion,
+    scripts: [
+      {
+        url: iframeBridge,
+      },
+    ],
+  });
+  return fs.writeFile(path.join(options.outDir, 'visualizer.html'), page);
+}

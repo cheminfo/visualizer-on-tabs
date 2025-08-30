@@ -12,22 +12,25 @@ import build from '../main/index.js';
 
 const argv = minimist(process.argv.slice(2));
 
-const options = {};
-
 if (!argv.outDir) {
+  console.log(`CLI args:
+    --outDir - output directory (required)
+    --dev - development mode with file watching
+    --config - path to JSON config file
+  `);
   throw new Error('The --outDir option is required.');
 }
 
-if (argv.watch) options.watch = argv.watch;
-if (argv.outDir) options.outDir = argv.outDir;
-if (argv.debug) options.debug = argv.debug;
-
+const mode = argv.dev ? 'development' : 'production';
+const watch = !!argv.dev;
+const outDir = argv.outDir;
+let config = {};
 if (argv.config) {
   const configFile = path.resolve(argv.config);
-  options.config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+  config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
 }
 
-const cleanup = await build(options);
+const cleanup = await build({ mode, watch, outDir, config });
 
 process.on('SIGINT', async () => {
   console.log('Build cancelled on SIGINT');
