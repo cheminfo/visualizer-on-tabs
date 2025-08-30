@@ -7,6 +7,7 @@ import BTabs from 'react-bootstrap/Tabs';
 import { Visualizer } from 'react-visualizer';
 
 import { getConfig } from '../config/config.js';
+import customConfig from '../config/custom.json' with { type: 'json' };
 import Tabs from '../main/Tabs.js';
 import iframeMessageHandler from '../main/iframeMessageHandler.js';
 import * as tabStorage from '../main/tabStorage.js';
@@ -15,6 +16,7 @@ import { rewriteURL } from '../util.js';
 import Login from './Login.js';
 import TabTitle from './TabTitle.js';
 
+const config = getConfig(customConfig);
 let tabInit = Promise.resolve();
 let currentIframe;
 
@@ -30,9 +32,13 @@ const pageQueryParameters = (() => {
 const iframeStyle = { position: 'static', flex: 2, border: 'none' };
 
 class App extends React.Component {
-  config = {};
+  config;
   constructor(props) {
     super(props);
+    this.config = window.structuredClone(config);
+    for (let key in this.config.possibleViews) {
+      this.config.possibleViews[key].id = key;
+    }
     this.onActiveTab = this.onActiveTab.bind(this);
 
     IframeBridge.registerHandler('tab', iframeMessageHandler);
@@ -69,20 +75,11 @@ class App extends React.Component {
       viewsList: [],
       activeTabKey: 0,
       isConfigLoaded: false,
-      config: {},
     };
 
-    this.loadConfig().then(() => this.loadTabs());
+    void this.loadTabs();
   }
 
-  async loadConfig() {
-    const config = await getConfig();
-    this.config = config;
-    this.setState((state) => {
-      state.isConfigLoaded = true;
-    });
-    return config;
-  }
   async loadTabs() {
     let firstTab;
     const loadTab = async (view) => {
@@ -99,7 +96,6 @@ class App extends React.Component {
     const data = tabStorage.load();
     // Load possible views first
     for (let key in this.config.possibleViews) {
-      this.config.possibleViews[key].id = key;
       let saved;
       if ((saved = data.find((el) => el.id === key))) {
         await loadTab(saved);
@@ -309,9 +305,6 @@ class App extends React.Component {
 
   render() {
     const arr = [];
-    if (!this.state.isConfigLoaded) {
-      return null;
-    }
     for (let view of this.state.viewsList) {
       const closable = view.closable === undefined ? true : view.closable;
       const saved =

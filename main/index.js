@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import path from 'node:path';
 import { fileURLToPath } from 'url';
 
@@ -19,17 +21,9 @@ const defaultConfig = {
   title: 'visualizer-on-tabs',
 };
 
-const buildApp = (options, outDir) => {
+const buildApp = (options, outDir, cleanup) => {
   const entries = [{ file: 'app.js' }];
-  const prom = [];
   for (const entry of entries) {
-    let resolve;
-    let reject;
-    let p = new Promise((_resolve, _reject) => {
-      resolve = _resolve;
-      reject = _reject;
-    });
-    prom.push(p);
     let config = {
       mode: options.debug ? 'development' : 'production',
       entry: path.join(__dirname, '../src', entry.file),
@@ -54,22 +48,47 @@ const buildApp = (options, outDir) => {
           },
         ],
       },
-      watch: options.watch,
     };
 
-    webpack(config, function handleError(err) {
+    function handleError(err, stats) {
       if (err) {
-        reject(err);
+        if (options.watch) {
+          console.error(err.stack, err.message);
+        } else {
+          throw err;
+        }
       } else {
         // TODO: use node's util.debuglog here and in flavor-builder
-        // eslint-disable-next-line no-console
-        console.log(`Build of ${entry.file} successful`);
-        resolve();
-      }
-    });
-  }
+        const statsJson = stats.toJson();
 
-  return Promise.all(prom);
+        if (statsJson.errors.length > 0) {
+          for (let error of statsJson.errors) {
+            console.error(error.message);
+          }
+          if (!options.watch) {
+            throw new Error(
+              `Build failed with ${statsJson.errors.length} error(s)`,
+            );
+          }
+        }
+        if (statsJson.warnings.length > 0) {
+          for (let warning of statsJson.warnings) {
+            console.warn(warning.message);
+          }
+        }
+        console.log(`Build of ${entry.file} successful`);
+        if (!options.watch) {
+          cleanup().catch(console.error);
+        }
+      }
+    }
+    const instance = webpack(config);
+    if (options.watch) {
+      instance.watch({ aggregateTimeout: 200 }, handleError);
+    } else {
+      instance.run(handleError);
+    }
+  }
 };
 
 const copyContent = (outDir) => {
@@ -109,11 +128,28 @@ export default async (options) => {
   options.config = { ...defaultConfig, ...options.config };
 
   const outDir = path.resolve(__dirname, '..', options.outDir);
+  await fs.ensureDir(outDir);
 
   const confPath = path.join(__dirname, '../src/config/custom.json');
-  await fs.writeFile(confPath, JSON.stringify(options.config));
-  await Promise.all([buildApp(options, outDir), copyContent(outDir)]);
-  await addIndex(outDir, options);
-  await addVisualizer(outDir, options);
-  return fs.unlink(confPath);
+  console.log('Copying files');
+  await Promise.all([
+    fs.writeFile(confPath, JSON.stringify(options.config)),
+    copyContent(outDir),
+    addIndex(outDir, options),
+    addVisualizer(outDir, options),
+  ]);
+
+  async function cleanup() {
+    if (fs.pathExistsSync(confPath)) {
+      console.log('Cleaning up');
+      await fs.unlink(confPath);
+    } else {
+      console.log('Nothing to clean up');
+    }
+  }
+
+  console.log('Building app');
+  void buildApp(options, outDir, cleanup);
+
+  return cleanup;
 };

@@ -28,10 +28,10 @@ if (argv.config) {
   });
 }
 
-try {
-  await build(options);
-  console.log('Build succeeded');
-} catch (e) {
-  console.log(e.message, e.stack);
-  console.error('Build failed');
-}
+const cleanup = await build(options);
+
+process.on('SIGINT', async () => {
+  console.log('Build cancelled on SIGINT');
+  cleanup().catch(console.error);
+  process.exit(1);
+});

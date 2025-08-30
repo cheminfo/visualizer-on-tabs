@@ -9,17 +9,15 @@
     "defaults"
   ],
   "scripts": {
-    "build": "npm run clean && npm run webpack",
-    "build:dev": "node bin/build.js --debug=1 --config=./dev.json",
+    "build": "node bin/build.js --debug=1 --config=./dev.json",
+    "build-watch": "node bin/build.js --watch --debug=1 --config=./dev.json",
     "clean": "rimraf out",
     "copy-static": "shx mkdir -p out && shx cp -r src/content/* out",
-    "dev": "npm run build:dev && npm run serve",
     "eslint": "eslint bin main src",
     "prettier": "prettier --check ./",
     "prettier-write": "prettier --write ./",
     "serve": "npx serve out/",
     "test": "node --test && npm run eslint",
-    "webpack": "node bin/build.js --debug=1",
     "watch": "npm run copy-static && npm run webpack -- --watch"
   },
   "dependencies": {
