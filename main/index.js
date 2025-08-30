@@ -13,10 +13,6 @@ import iframeBridge from './iframe-bridge.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const defaultOptions = {
-  outDir: 'out',
-};
-
 const defaultConfig = {
   title: 'visualizer-on-tabs',
 };
@@ -26,7 +22,8 @@ const buildApp = (options, outDir, cleanup) => {
   for (const entry of entries) {
     let config = {
       mode: options.debug ? 'development' : 'production',
-      entry: path.join(__dirname, '../src', entry.file),
+      context: path.resolve(__dirname, '../'),
+      entry: path.resolve(__dirname, '../src', entry.file),
       output: {
         path: outDir,
         filename: entry.file,
@@ -126,10 +123,9 @@ const addVisualizer = async (outDir, options) => {
 };
 
 export default async (options) => {
-  options = { ...defaultOptions, ...options };
   options.config = { ...defaultConfig, ...options.config };
 
-  const outDir = path.resolve(__dirname, '..', options.outDir);
+  const outDir = path.resolve(options.outDir);
   await fs.mkdir(outDir, { recursive: true });
 
   const confPath = path.join(__dirname, '../src/config/custom.json');
