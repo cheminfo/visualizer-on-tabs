@@ -8,10 +8,11 @@ const styles = {
 
 class Login extends React.Component {
   config = {};
-  constructor(config) {
-    super();
+  constructor(props) {
+    super(props);
+    const config = props.config;
     this.state = {};
-    this.config = config;
+    this.config = props.config;
     this.logout = this.logout.bind(this);
     if (!config.rocLogin) return;
 
