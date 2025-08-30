@@ -28,7 +28,6 @@
     "bootstrap": "^5.3.3",
     "fs-extra": "^7.0.1",
     "iframe-bridge": "^1.1.0",
-    "js-yaml": "^3.12.1",
     "lockr": "^0.8.5",
     "lodash": "^4.17.21",
     "minimist": "^1.2.6",

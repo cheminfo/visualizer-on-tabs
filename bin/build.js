@@ -6,7 +6,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 
-import yaml from 'js-yaml';
 import minimist from 'minimist';
 
 import build from '../main/index.js';
@@ -23,9 +22,7 @@ if (argv.config) {
     path.join(import.meta.dirname, '..'),
     argv.config,
   );
-  options.config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'), {
-    filename: configFile,
-  });
+  options.config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
 }
 
 const cleanup = await build(options);
