@@ -9,7 +9,7 @@
     "defaults"
   ],
   "scripts": {
-    "build": "node bin/build.js --debug=1 --config=./dev.json",
+    "build": "node bin/build.js --config=./dev.json",
     "build-watch": "node bin/build.js --watch --debug=1 --config=./dev.json",
     "clean": "rimraf out",
     "copy-static": "shx mkdir -p out && shx cp -r src/content/* out",
