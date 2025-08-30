@@ -26,7 +26,6 @@
     "@babel/preset-react": "^7.27.1",
     "babel-loader": "^10.0.0",
     "bootstrap": "^5.3.3",
-    "fs-extra": "^7.0.1",
     "iframe-bridge": "^1.1.0",
     "lockr": "^0.8.5",
     "lodash": "^4.17.21",

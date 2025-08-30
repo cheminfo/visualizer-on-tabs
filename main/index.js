@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'url';
 
-import fs from 'fs-extra';
 import _ from 'lodash';
 import visualizer from 'react-visualizer';
 import webpack from 'webpack';
@@ -92,7 +92,9 @@ const buildApp = (options, outDir, cleanup) => {
 };
 
 const copyContent = (outDir) => {
-  return fs.copy(path.join(__dirname, '../src/content'), outDir);
+  return fs.cp(path.join(__dirname, '../src/content'), outDir, {
+    recursive: true,
+  });
 };
 
 const addIndex = async (outDir, options) => {
@@ -128,7 +130,7 @@ export default async (options) => {
   options.config = { ...defaultConfig, ...options.config };
 
   const outDir = path.resolve(__dirname, '..', options.outDir);
-  await fs.ensureDir(outDir);
+  await fs.mkdir(outDir, { recursive: true });
 
   const confPath = path.join(__dirname, '../src/config/custom.json');
   console.log('Copying files');
@@ -140,12 +142,9 @@ export default async (options) => {
   ]);
 
   async function cleanup() {
-    if (fs.pathExistsSync(confPath)) {
-      console.log('Cleaning up');
-      await fs.unlink(confPath);
-    } else {
-      console.log('Nothing to clean up');
-    }
+    console.log('Cleaning up');
+    // Normally, the file should exist when this is called.
+    await fs.unlink(confPath);
   }
 
   console.log('Building app');
