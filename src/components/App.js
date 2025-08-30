@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 
-import IframeBridge from 'iframe-bridge';
+import { postMessage, registerHandler } from 'iframe-bridge/main';
 import React from 'react';
 import Tab from 'react-bootstrap/Tab';
 import BTabs from 'react-bootstrap/Tabs';
@@ -41,8 +41,8 @@ class App extends React.Component {
     }
     this.onActiveTab = this.onActiveTab.bind(this);
 
-    IframeBridge.registerHandler('tab', iframeMessageHandler);
-    IframeBridge.registerHandler('admin', (data, [level2]) => {
+    registerHandler('tab', iframeMessageHandler);
+    registerHandler('admin', (data, [level2]) => {
       if (level2 === 'connect' && data.windowID !== undefined) {
         if (!currentIframe) {
           // The iframe was refreshed
@@ -140,7 +140,7 @@ class App extends React.Component {
   sendTabMessage(data) {
     const viewInfo = this.config.possibleViews[data.id];
     if (viewInfo) {
-      IframeBridge.postMessage('tab.message', data.message, viewInfo.windowID);
+      postMessage('tab.message', data.message, viewInfo.windowID);
     }
   }
 
@@ -249,7 +249,7 @@ class App extends React.Component {
 
   sendData(id) {
     const viewInfo = this.config.possibleViews[id];
-    IframeBridge.postMessage(
+    postMessage(
       'tab.data',
       { ...viewInfo.data, queryParameters: pageQueryParameters },
       viewInfo.windowID,
@@ -289,11 +289,7 @@ class App extends React.Component {
 
   sendTabFocusEvent(key) {
     if (this.config.possibleViews[key]) {
-      IframeBridge.postMessage(
-        'tab.focus',
-        {},
-        this.config.possibleViews[key].windowID,
-      );
+      postMessage('tab.focus', {}, this.config.possibleViews[key].windowID);
     }
   }
 
