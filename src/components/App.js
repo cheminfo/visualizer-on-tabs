@@ -86,9 +86,6 @@ class App extends React.Component {
       if (!firstTab) firstTab = view.id;
       await this.doTab(view, {
         noFocus: true,
-        // Setting this to true should load all the tabs on page load
-        // It is discouraged to do this because loading hidden iframes
-        // lead to layout issues. Especially in Firefox.
         load: this.config.loadHidden,
         noFocusEvent: true,
       });
