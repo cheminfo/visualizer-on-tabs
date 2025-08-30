@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "module": "main/index.js",
-  "sideEffects": false,
+  "bin": "bin/build.js",
   "browserslist": [
     "defaults"
   ],
