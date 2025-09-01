@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "visualizer-on-tabs webpack builder",
   "type": "module",
-  "module": "main/index.js",
+  "exports": {
+    ".": "./main/index.js"
+  },
   "bin": "bin/build.js",
   "browserslist": [
     "defaults"
