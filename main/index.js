@@ -126,7 +126,7 @@ export default async (options) => {
 
 function copyContent(options) {
   return fs.cp(
-    path.join(__dirname, '../src/content'),
+    path.join(__dirname, '../src/static'),
     path.join(options.outDir, 'static'),
     {
       recursive: true,
