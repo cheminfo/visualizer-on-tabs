@@ -7,12 +7,10 @@ const styles = {
 };
 
 class Login extends React.Component {
-  config = {};
   constructor(props) {
     super(props);
-    const config = props.config;
+    const { config } = props;
     this.state = {};
-    this.config = props.config;
     this.logout = this.logout.bind(this);
     if (!config.rocLogin) return;
 
@@ -30,8 +28,8 @@ class Login extends React.Component {
   }
 
   async session() {
-    if (!this.config.rocLogin) return;
-    const login = this.config.rocLogin;
+    if (!this.props.config.rocLogin) return;
+    const login = this.props.config.rocLogin;
     const response = await fetch(`${login.url}/auth/session`, {
       credentials: 'include',
     });
@@ -54,10 +52,13 @@ class Login extends React.Component {
   }
 
   async logout() {
-    if (!this.config.rocLogin) return;
-    const response = await fetch(`${this.config.rocLogin.url}/auth/logout`, {
-      credentials: 'include',
-    });
+    if (!this.props.config.rocLogin) return;
+    const response = await fetch(
+      `${this.props.config.rocLogin.url}/auth/logout`,
+      {
+        credentials: 'include',
+      },
+    );
     if (!response.ok) {
       throw new Error(`Unexpected logout response: ${response.statusText}`);
     }
@@ -65,7 +66,7 @@ class Login extends React.Component {
   }
 
   render() {
-    if (!this.config.rocLogin) {
+    if (!this.props.config.rocLogin) {
       return <div />;
     }
     if (!this.state.user || this.state.user === 'anonymous') {
