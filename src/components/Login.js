@@ -23,6 +23,9 @@ class Login extends React.Component {
         config.rocLogin.redirect || window.location.href
       }`;
     }
+  }
+
+  componentDidMount() {
     void this.session();
   }
 
@@ -58,7 +61,7 @@ class Login extends React.Component {
     if (!response.ok) {
       throw new Error(`Unexpected logout response: ${response.statusText}`);
     }
-    this.session();
+    void this.session();
   }
 
   render() {
