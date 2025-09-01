@@ -17,7 +17,8 @@ const defaultConfig = {
   title: 'visualizer-on-tabs',
 };
 
-const buildApp = (options, outDir, cleanup) => {
+async function buildApp(options, outDir, cleanup) {
+  const { promise, resolve, reject } = Promise.withResolvers();
   const entries = [{ file: 'app.js' }];
   for (const entry of entries) {
     let config = {
@@ -52,7 +53,7 @@ const buildApp = (options, outDir, cleanup) => {
         if (options.watch) {
           console.error(err.stack, err.message);
         } else {
-          throw err;
+          reject(err);
         }
       } else {
         // TODO: use node's util.debuglog here and in flavor-builder
@@ -63,8 +64,10 @@ const buildApp = (options, outDir, cleanup) => {
             console.error(error.message);
           }
           if (!options.watch) {
-            throw new Error(
-              `Build failed with ${statsJson.errors.length} error(s)`,
+            reject(
+              new Error(
+                `Build failed with ${statsJson.errors.length} error(s)`,
+              ),
             );
           }
         }
@@ -75,18 +78,24 @@ const buildApp = (options, outDir, cleanup) => {
         }
         console.log(`Build of ${entry.file} successful`);
         if (!options.watch) {
-          cleanup().catch(console.error);
+          cleanup()
+            .catch(console.error)
+            .then(() => resolve(cleanup));
         }
       }
     }
     const instance = webpack(config);
     if (options.watch) {
       instance.watch({ aggregateTimeout: 200 }, handleError);
+      // In watch mode we resolve before the first build is done.
+      resolve(cleanup);
     } else {
+      // With a single run, the handler will resolve / reject the promise.
       instance.run(handleError);
     }
   }
-};
+  return promise;
+}
 
 export default async (options) => {
   Object.assign(options.config, defaultConfig);
@@ -110,7 +119,7 @@ export default async (options) => {
   }
 
   console.log('Building app');
-  void buildApp(options, outDir, cleanup);
+  await buildApp(options, outDir, cleanup);
 
   return cleanup;
 };
