@@ -32,12 +32,10 @@ const pageQueryParameters = (() => {
 const iframeStyle = { position: 'static', flex: 2, border: 'none' };
 
 class App extends React.Component {
-  config;
   constructor(props) {
     super(props);
-    this.config = window.structuredClone(config);
-    for (let key in this.config.possibleViews) {
-      this.config.possibleViews[key].id = key;
+    for (let key in config.possibleViews) {
+      config.possibleViews[key].id = key;
     }
     this.onActiveTab = this.onActiveTab.bind(this);
 
@@ -46,11 +44,11 @@ class App extends React.Component {
       if (level2 === 'connect' && data.windowID !== undefined) {
         if (!currentIframe) {
           // The iframe was refreshed
-          this.config.possibleViews[this.state.activeTabKey].windowID =
+          config.possibleViews[this.state.activeTabKey].windowID =
             data.windowID;
           this.sendData(this.state.activeTabKey);
         } else {
-          this.config.possibleViews[currentIframe.id].windowID = data.windowID;
+          config.possibleViews[currentIframe.id].windowID = data.windowID;
           currentIframe.resolve();
           currentIframe = null;
         }
@@ -86,23 +84,23 @@ class App extends React.Component {
       if (!firstTab) firstTab = view.id;
       await this.doTab(view, {
         noFocus: true,
-        load: this.config.loadHidden,
+        load: config.loadHidden,
         noFocusEvent: true,
       });
     };
     const data = tabStorage.load();
     // Load possible views first
-    for (let key in this.config.possibleViews) {
+    for (let key in config.possibleViews) {
       let saved;
       if ((saved = data.find((el) => el.id === key))) {
         await loadTab(saved);
       } else {
-        await loadTab(this.config.possibleViews[key]);
+        await loadTab(config.possibleViews[key]);
       }
     }
 
     for (let i = 0; i < data.length; i++) {
-      if (!this.config.possibleViews[data[i].id]) {
+      if (!config.possibleViews[data[i].id]) {
         await loadTab(data[i]);
       }
     }
@@ -118,12 +116,12 @@ class App extends React.Component {
 
   setTabStatus(data) {
     // Find view with given window ID
-    const ids = Object.keys(this.config.possibleViews);
+    const ids = Object.keys(config.possibleViews);
     let id = ids.find(
-      (id) => this.config.possibleViews[id].windowID === data.windowID,
+      (id) => config.possibleViews[id].windowID === data.windowID,
     );
     if (!id) return;
-    let view = this.config.possibleViews[id];
+    let view = config.possibleViews[id];
 
     view = this.state.viewsList.find((el) => el.id === view.id);
     if (!view) return;
@@ -135,7 +133,7 @@ class App extends React.Component {
   }
 
   sendTabMessage(data) {
-    const viewInfo = this.config.possibleViews[data.id];
+    const viewInfo = config.possibleViews[data.id];
     if (viewInfo) {
       postMessage('tab.message', data.message, viewInfo.windowID);
     }
@@ -150,8 +148,8 @@ class App extends React.Component {
   }
 
   async doTab(obj, options) {
-    if (!this.config.possibleViews[obj.id]) {
-      this.config.possibleViews[obj.id] = {
+    if (!config.possibleViews[obj.id]) {
+      config.possibleViews[obj.id] = {
         id: obj.id,
         url: obj.url,
         data: obj.data,
@@ -159,16 +157,16 @@ class App extends React.Component {
         rawIframe: obj.rawIframe,
       };
     } else {
-      this.config.possibleViews[obj.id].data = obj.data;
+      config.possibleViews[obj.id].data = obj.data;
     }
 
-    if (this.config.rewriteRules) {
+    if (config.rewriteRules) {
       let newURL = rewriteURL(
-        this.config.rewriteRules,
-        this.config.possibleViews[obj.id].url,
+        config.rewriteRules,
+        config.possibleViews[obj.id].url,
       );
       if (newURL) {
-        this.config.possibleViews[obj.id].rewrittenUrl = newURL;
+        config.possibleViews[obj.id].rewrittenUrl = newURL;
       }
     }
 
@@ -183,7 +181,7 @@ class App extends React.Component {
     const focusedTabId = options.noFocus ? undefined : id;
     let viewFromList = this.state.viewsList.find((el) => el.id === id);
     const newTab = !viewFromList;
-    const viewInfo = this.config.possibleViews[id];
+    const viewInfo = config.possibleViews[id];
 
     if (!viewInfo) throw new Error('unreachable');
     if (!viewFromList) {
@@ -245,7 +243,7 @@ class App extends React.Component {
   }
 
   sendData(id) {
-    const viewInfo = this.config.possibleViews[id];
+    const viewInfo = config.possibleViews[id];
     postMessage(
       'tab.data',
       { ...viewInfo.data, queryParameters: pageQueryParameters },
@@ -254,10 +252,10 @@ class App extends React.Component {
   }
 
   async removeTab(id) {
-    const forbiddenPossibleViews = Object.keys(this.config.possibleViews);
+    const forbiddenPossibleViews = Object.keys(config.possibleViews);
     tabStorage.remove(id);
     if (forbiddenPossibleViews.indexOf(id) === -1) {
-      delete this.config.possibleViews[id];
+      delete config.possibleViews[id];
     }
     let idx = this.state.viewsList.findIndex((el) => el.id === id);
     if (idx === -1) return;
@@ -285,8 +283,8 @@ class App extends React.Component {
   }
 
   sendTabFocusEvent(key) {
-    if (this.config.possibleViews[key]) {
-      postMessage('tab.focus', {}, this.config.possibleViews[key].windowID);
+    if (config.possibleViews[key]) {
+      postMessage('tab.focus', {}, config.possibleViews[key].windowID);
     }
   }
 
@@ -326,11 +324,9 @@ class App extends React.Component {
               url="visualizer.html"
               viewURL={view.rewrittenUrl || view.url}
               version={
-                this.visualizerVersion ||
-                this.config.visualizerVersion ||
-                'auto'
+                this.visualizerVersion || config.visualizerVersion || 'auto'
               }
-              config={this.config.visualizerConfig}
+              config={config.visualizerConfig}
               style={iframeStyle}
             />
           );
@@ -358,7 +354,7 @@ class App extends React.Component {
 
     return (
       <div className="visualizer-on-tabs-app">
-        <Login config={this.config} />
+        <Login config={config} />
         <div className="visualizer-on-tabs-content d-flex flex-column">
           <BTabs
             id="visualizer-on-tabs-tab"
