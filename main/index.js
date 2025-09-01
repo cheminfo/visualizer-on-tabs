@@ -2,6 +2,7 @@
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import _ from 'lodash';
 import visualizer from 'react-visualizer';
@@ -105,6 +106,7 @@ export default async (options) => {
   console.log('Copying files');
   await Promise.all([
     fs.writeFile(confPath, JSON.stringify(options.config)),
+    copyBootstrap(options),
     copyContent(options),
     addIndex(options),
     addVisualizer(options),
@@ -123,9 +125,24 @@ export default async (options) => {
 };
 
 function copyContent(options) {
-  return fs.cp(path.join(__dirname, '../src/content'), options.outDir, {
-    recursive: true,
-  });
+  return fs.cp(
+    path.join(__dirname, '../src/content'),
+    path.join(options.outDir, 'static'),
+    {
+      recursive: true,
+    },
+  );
+}
+
+async function copyBootstrap(options) {
+  const bootstrapCss = fileURLToPath(
+    import.meta.resolve('bootstrap/dist/css/bootstrap.min.css'),
+  );
+  await fs.mkdir(path.join(options.outDir, 'static'), { recursive: true });
+  return fs.copyFile(
+    bootstrapCss,
+    path.join(options.outDir, 'static/bootstrap.min.css'),
+  );
 }
 
 async function addIndex(options) {
