@@ -7,6 +7,12 @@
     ".": "./main/index.js"
   },
   "bin": "bin/build.js",
+  "files": [
+    "main",
+    "src",
+    "bin",
+    "!**/*.test.js"
+  ],
   "browserslist": [
     "defaults"
   ],
