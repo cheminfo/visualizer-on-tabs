@@ -2,7 +2,6 @@
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'url';
 
 import _ from 'lodash';
 import visualizer from 'react-visualizer';
@@ -10,8 +9,7 @@ import webpack from 'webpack';
 
 import iframeBridge from './iframe-bridge.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = import.meta.dirname;
 
 const defaultConfig = {
   title: 'visualizer-on-tabs',
