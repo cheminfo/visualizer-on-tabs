@@ -1,17 +1,15 @@
-'use strict';
-
-module.exports = {
+export default {
   visualizerConfig: {
     debugLevel: 0,
     filters: [],
     modules: {
-      folders: ['modules/types']
+      folders: ['modules/types'],
     },
-    header: false
+    header: false,
   },
   possibleViews: {
     Home: {
-      url: ''
-    }
-  }
+      url: '',
+    },
+  },
 };

@@ -14,13 +14,10 @@ class TabTitle extends React.Component {
   }
 
   render() {
-    var closeHandle;
+    let closeHandle;
     if (this.props.onTabClosed) {
       closeHandle = (
-        <span
-          className="close-tab-glyph"
-          onClick={this.onClosedClicked}
-        >
+        <span className="close-tab-glyph" onClick={this.onClosedClicked}>
           ×
         </span>
       );
@@ -29,7 +26,11 @@ class TabTitle extends React.Component {
     }
 
     return (
-      <div title={this.props.textTitle} style={this.props.textStyle} className="d-flex flex-row gap-2 align-items-baseline">
+      <div
+        title={this.props.textTitle}
+        style={this.props.textStyle}
+        className="d-flex flex-row gap-2 align-items-baseline"
+      >
         {this.props.name}
         {closeHandle}
       </div>

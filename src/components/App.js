@@ -1,32 +1,27 @@
-import IframeBridge from 'iframe-bridge';
+/* eslint-disable no-await-in-loop */
+
+import { postMessage, registerHandler } from 'iframe-bridge/main';
 import React from 'react';
-import { Visualizer } from 'react-visualizer';
 import Tab from 'react-bootstrap/Tab';
 import BTabs from 'react-bootstrap/Tabs';
+import { Visualizer } from 'react-visualizer';
 
-import Tabs from '../main/Tabs';
-import iframeMessageHandler from '../main/iframeMessageHandler';
-import tabStorage from '../main/tabStorage';
-import { rewriteURL } from '../util';
+import { getConfig } from '../config/config.js';
+import customConfig from '../config/custom.json' with { type: 'json' };
+import Tabs from '../main/Tabs.js';
+import iframeMessageHandler from '../main/iframeMessageHandler.js';
+import * as tabStorage from '../main/tabStorage.js';
+import { rewriteURL } from '../util.js';
 
-import Login from './Login';
-import TabTitle from './TabTitle';
+import Login from './Login.js';
+import TabTitle from './TabTitle.js';
 
-const conf = require('../config/config.js');
-
-// Setting this to true should load all the tabs on page load
-// It is discouraged to do this because loading hidden iframes
-// lead to layout issues. Especially in Firefox.
-const loadHidden = conf.loadHidden || false;
-
-const possibleViews = conf.possibleViews;
-const forbiddenPossibleViews = Object.keys(possibleViews);
-
+const config = getConfig(customConfig);
 let tabInit = Promise.resolve();
 let currentIframe;
 
 const pageURL = new URL(window.location);
-const pageQueryParameters = (function () {
+const pageQueryParameters = (() => {
   let params = {};
   for (let key of pageURL.searchParams.keys()) {
     params[key] = pageURL.searchParams.get(key);
@@ -39,17 +34,21 @@ const iframeStyle = { position: 'static', flex: 2, border: 'none' };
 class App extends React.Component {
   constructor(props) {
     super(props);
+    for (let key in config.possibleViews) {
+      config.possibleViews[key].id = key;
+    }
     this.onActiveTab = this.onActiveTab.bind(this);
 
-    IframeBridge.registerHandler('tab', iframeMessageHandler);
-    IframeBridge.registerHandler('admin', (data, [level2]) => {
+    registerHandler('tab', iframeMessageHandler);
+    registerHandler('admin', (data, [level2]) => {
       if (level2 === 'connect' && data.windowID !== undefined) {
         if (!currentIframe) {
           // The iframe was refreshed
-          possibleViews[this.state.activeTabKey].windowID = data.windowID;
+          config.possibleViews[this.state.activeTabKey].windowID =
+            data.windowID;
           this.sendData(this.state.activeTabKey);
         } else {
-          possibleViews[currentIframe.id].windowID = data.windowID;
+          config.possibleViews[currentIframe.id].windowID = data.windowID;
           currentIframe.resolve();
           currentIframe = null;
         }
@@ -72,10 +71,11 @@ class App extends React.Component {
 
     this.state = {
       viewsList: [],
-      activeTabKey: 0
+      activeTabKey: 0,
+      isConfigLoaded: false,
     };
 
-    this.loadTabs();
+    void this.loadTabs();
   }
 
   async loadTabs() {
@@ -84,24 +84,23 @@ class App extends React.Component {
       if (!firstTab) firstTab = view.id;
       await this.doTab(view, {
         noFocus: true,
-        load: loadHidden,
-        noFocusEvent: true
+        load: config.loadHidden,
+        noFocusEvent: true,
       });
     };
     const data = tabStorage.load();
     // Load possible views first
-    for (let key in possibleViews) {
-      possibleViews[key].id = key;
+    for (let key in config.possibleViews) {
       let saved;
       if ((saved = data.find((el) => el.id === key))) {
         await loadTab(saved);
       } else {
-        await loadTab(possibleViews[key]);
+        await loadTab(config.possibleViews[key]);
       }
     }
 
     for (let i = 0; i < data.length; i++) {
-      if (!possibleViews[data[i].id]) {
+      if (!config.possibleViews[data[i].id]) {
         await loadTab(data[i]);
       }
     }
@@ -117,52 +116,57 @@ class App extends React.Component {
 
   setTabStatus(data) {
     // Find view with given window ID
-    const ids = Object.keys(possibleViews);
-    let id = ids.find((id) => possibleViews[id].windowID === data.windowID);
+    const ids = Object.keys(config.possibleViews);
+    let id = ids.find(
+      (id) => config.possibleViews[id].windowID === data.windowID,
+    );
     if (!id) return;
-    let view = possibleViews[id];
+    let view = config.possibleViews[id];
 
     view = this.state.viewsList.find((el) => el.id === view.id);
     if (!view) return;
 
-    view.status = Object.assign({}, view.status, data.message);
+    view.status = { ...view.status, ...data.message };
     this.setState((state) => ({
-      viewsList: state.viewsList
+      viewsList: state.viewsList,
     }));
   }
 
   sendTabMessage(data) {
-    const viewInfo = possibleViews[data.id];
+    const viewInfo = config.possibleViews[data.id];
     if (viewInfo) {
-      IframeBridge.postMessage('tab.message', data.message, viewInfo.windowID);
+      postMessage('tab.message', data.message, viewInfo.windowID);
     }
   }
 
   async focusTab(tabId) {
     if (this.state.viewsList.find((el) => el.id === tabId)) {
       await this.showTab(tabId, {
-        noData: true
+        noData: true,
       });
     }
   }
 
   async doTab(obj, options) {
-    if (!possibleViews[obj.id]) {
-      possibleViews[obj.id] = {
+    if (!config.possibleViews[obj.id]) {
+      config.possibleViews[obj.id] = {
         id: obj.id,
         url: obj.url,
         data: obj.data,
         closable: obj.closable,
-        rawIframe: obj.rawIframe
+        rawIframe: obj.rawIframe,
       };
     } else {
-      possibleViews[obj.id].data = obj.data;
+      config.possibleViews[obj.id].data = obj.data;
     }
 
-    if (conf.rewriteRules) {
-      let newURL = rewriteURL(conf.rewriteRules, possibleViews[obj.id].url);
+    if (config.rewriteRules) {
+      let newURL = rewriteURL(
+        config.rewriteRules,
+        config.possibleViews[obj.id].url,
+      );
       if (newURL) {
-        possibleViews[obj.id].rewrittenUrl = newURL;
+        config.possibleViews[obj.id].rewrittenUrl = newURL;
       }
     }
 
@@ -177,16 +181,16 @@ class App extends React.Component {
     const focusedTabId = options.noFocus ? undefined : id;
     let viewFromList = this.state.viewsList.find((el) => el.id === id);
     const newTab = !viewFromList;
-    const viewInfo = possibleViews[id];
+    const viewInfo = config.possibleViews[id];
 
     if (!viewInfo) throw new Error('unreachable');
     if (!viewFromList) {
       viewFromList = {
-        id: id,
+        id,
         url: viewInfo.url,
         rewrittenUrl: viewInfo.rewrittenUrl,
         closable: viewInfo.closable,
-        rawIframe: viewInfo.rawIframe
+        rawIframe: viewInfo.rawIframe,
       };
       this.state.viewsList.push(viewFromList);
     }
@@ -197,11 +201,13 @@ class App extends React.Component {
     // We need to get the IframeBridge ID of that frame and prevent any other iframes
     // to load during that time
     if (firstRender) {
+      // TODO: there is probably a cleaner way than a global promise
+      // eslint-disable-next-line require-atomic-updates
       tabInit = new Promise((resolve) => {
         viewFromList.rendered = true;
         this.setState((state) => ({
           activeTabKey: focusedTabId,
-          viewsList: state.viewsList
+          viewsList: state.viewsList,
         }));
 
         setTimeout(() => {
@@ -212,14 +218,14 @@ class App extends React.Component {
         }, 3000);
         currentIframe = {
           resolve,
-          id
+          id,
         };
       });
       await tabInit;
     } else {
       this.setState((state) => ({
         activeTabKey: focusedTabId,
-        viewsList: state.viewsList
+        viewsList: state.viewsList,
       }));
     }
 
@@ -237,20 +243,19 @@ class App extends React.Component {
   }
 
   sendData(id) {
-    const viewInfo = possibleViews[id];
-    IframeBridge.postMessage(
+    const viewInfo = config.possibleViews[id];
+    postMessage(
       'tab.data',
-      Object.assign({}, viewInfo.data, {
-        queryParameters: pageQueryParameters
-      }),
-      viewInfo.windowID
+      { ...viewInfo.data, queryParameters: pageQueryParameters },
+      viewInfo.windowID,
     );
   }
 
   async removeTab(id) {
+    const forbiddenPossibleViews = Object.keys(config.possibleViews);
     tabStorage.remove(id);
     if (forbiddenPossibleViews.indexOf(id) === -1) {
-      delete possibleViews[id];
+      delete config.possibleViews[id];
     }
     let idx = this.state.viewsList.findIndex((el) => el.id === id);
     if (idx === -1) return;
@@ -273,25 +278,24 @@ class App extends React.Component {
 
     await this.showTab(newActiveTab, {
       noData: true,
-      force: true
+      force: true,
     });
   }
 
   sendTabFocusEvent(key) {
-    if (possibleViews[key]) {
-      IframeBridge.postMessage('tab.focus', {}, possibleViews[key].windowID);
+    if (config.possibleViews[key]) {
+      postMessage('tab.focus', {}, config.possibleViews[key].windowID);
     }
   }
 
   async onActiveTab(key) {
     await this.showTab(key, {
-      noData: true
+      noData: true,
     });
   }
 
   render() {
     const arr = [];
-
     for (let view of this.state.viewsList) {
       const closable = view.closable === undefined ? true : view.closable;
       const saved =
@@ -320,9 +324,9 @@ class App extends React.Component {
               url="visualizer.html"
               viewURL={view.rewrittenUrl || view.url}
               version={
-                this.visualizerVersion || conf.visualizerVersion || 'auto'
+                this.visualizerVersion || config.visualizerVersion || 'auto'
               }
-              config={conf.visualizerConfig}
+              config={config.visualizerConfig}
               style={iframeStyle}
             />
           );
@@ -344,13 +348,13 @@ class App extends React.Component {
           eventKey={view.id}
         >
           {viewPage}
-        </Tab>
+        </Tab>,
       );
     }
 
     return (
       <div className="visualizer-on-tabs-app">
-        <Login />
+        <Login config={config} />
         <div className="visualizer-on-tabs-content d-flex flex-column">
           <BTabs
             id="visualizer-on-tabs-tab"

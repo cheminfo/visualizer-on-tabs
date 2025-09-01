@@ -1,135 +1,174 @@
-'use strict';
-
 /* eslint-disable no-console */
 
-const path = require('path');
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const webpack = require('webpack');
-const _ = require('lodash');
-const fs = require('fs-extra');
-const { makeVisualizerPage } = require('react-visualizer');
+import _ from 'lodash';
+import visualizer from 'react-visualizer';
+import webpack from 'webpack';
 
-const iframeBridge = require('./iframe-bridge');
+import iframeBridge from './iframe-bridge.js';
 
-const defaultOptions = {
-  outDir: 'out'
-};
+const __dirname = import.meta.dirname;
 
 const defaultConfig = {
-  title: 'visualizer-on-tabs'
+  title: 'visualizer-on-tabs',
 };
 
-module.exports = async function (options) {
-  options = Object.assign({}, defaultOptions, options);
-  options.config = Object.assign({}, defaultConfig, options.config);
+async function buildApp(options, outDir, cleanup) {
+  const { promise, resolve, reject } = Promise.withResolvers();
+  const entries = [{ file: 'app.js' }];
+  for (const entry of entries) {
+    let config = {
+      mode: options.mode === 'development' ? 'development' : 'production',
+      context: path.resolve(__dirname, '../'),
+      entry: path.resolve(__dirname, '../src', entry.file),
+      output: {
+        path: outDir,
+        filename: entry.file,
+      },
+      devtool: 'source-map',
+      module: {
+        rules: [
+          {
+            test: /\.js$/,
+            include: [
+              path.resolve(__dirname, '../src'),
+              path.resolve(__dirname, '../node_modules/iframe-bridge'),
+            ],
+            loader: 'babel-loader',
+            options: {
+              cwd: path.join(__dirname, '..'),
+              presets: ['@babel/env', '@babel/react'],
+            },
+          },
+        ],
+      },
+    };
 
-  const outDir = path.resolve(__dirname, '..', options.outDir);
+    function handleError(err, stats) {
+      if (err) {
+        if (options.watch) {
+          console.error(err.stack, err.message);
+        } else {
+          reject(err);
+        }
+      } else {
+        // TODO: use node's util.debuglog here and in flavor-builder
+        const statsJson = stats.toJson();
+
+        if (statsJson.errors.length > 0) {
+          for (let error of statsJson.errors) {
+            console.error(error.message);
+          }
+          if (!options.watch) {
+            reject(
+              new Error(
+                `Build failed with ${statsJson.errors.length} error(s)`,
+              ),
+            );
+          }
+        }
+        if (statsJson.warnings.length > 0) {
+          for (let warning of statsJson.warnings) {
+            console.warn(warning.message);
+          }
+        }
+        console.log(`Build of ${entry.file} successful`);
+        if (!options.watch) {
+          cleanup()
+            .catch(console.error)
+            .then(() => resolve(cleanup));
+        }
+      }
+    }
+    const instance = webpack(config);
+    if (options.watch) {
+      instance.watch({ aggregateTimeout: 200 }, handleError);
+      // In watch mode we resolve before the first build is done.
+      resolve(cleanup);
+    } else {
+      // With a single run, the handler will resolve / reject the promise.
+      instance.run(handleError);
+    }
+  }
+  return promise;
+}
+
+export default async (options) => {
+  Object.assign(options.config, defaultConfig);
+
+  const outDir = path.resolve(options.outDir);
+  await fs.mkdir(outDir, { recursive: true });
 
   const confPath = path.join(__dirname, '../src/config/custom.json');
-  await fs.writeFile(confPath, JSON.stringify(options.config));
-  await Promise.all([buildApp(), copyContent()]);
-  await addIndex(outDir, options);
-  await addVisualizer(outDir, options);
-  return fs.unlink(confPath);
+  console.log('Copying files');
+  await Promise.all([
+    fs.writeFile(confPath, JSON.stringify(options.config)),
+    copyBootstrap(options),
+    copyContent(options),
+    addIndex(options),
+    addVisualizer(options),
+  ]);
 
-  function buildApp() {
-    const entries = [{ file: 'app.js' }];
-
-    const prom = [];
-    for (const entry of entries) {
-      let resolve;
-      let reject;
-      var p = new Promise((_resolve, _reject) => {
-        resolve = _resolve;
-        reject = _reject;
-      });
-      prom.push(p);
-      let config = {
-        mode: options.debug ? 'development' : 'production',
-        entry: path.join(__dirname, '../src', entry.file),
-        output: {
-          path: outDir,
-          filename: entry.file
-        },
-        devtool: 'source-map',
-        module: {
-          rules: [
-            {
-              test: /\.js$/,
-              include: [
-                path.resolve(__dirname, '../src'),
-                path.resolve(__dirname, '../node_modules/iframe-bridge')
-              ],
-              loader: 'babel-loader',
-              options: {
-                cwd: path.join(__dirname, '..'),
-                presets: [
-                  [
-                    '@babel/env',
-                    {
-                      targets: {
-                        browsers: [
-                          'chrome >= 54', // Last version supported on windows 7
-                          'firefox >= 45',
-                        ]
-                      }
-                    }
-                  ],
-                  '@babel/react'
-                ]
-              }
-            }
-          ]
-        },
-        watch: options.watch
-      };
-
-      webpack(config, function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          console.log(`Build of ${entry.file} successful`);
-          resolve();
-        }
-      });
-    }
-
-    return Promise.all(prom);
+  async function cleanup() {
+    console.log('Cleaning up');
+    // Normally, the file should exist when this is called.
+    await fs.unlink(confPath);
   }
 
-  function copyContent() {
-    return fs.copy(path.join(__dirname, '../src/content'), outDir);
-  }
+  console.log('Building app');
+  await buildApp(options, outDir, cleanup);
+
+  return cleanup;
 };
 
-
-async function addIndex(outDir, options) {
-  const content = await fs.readFile(
-    path.join(__dirname, '../src/template/index.html'),
-    'utf8'
-  );
-  const tpl = _.template(content);
-  return fs.writeFile(
-    path.join(outDir, 'index.html'),
-    tpl({
-      title: options.config.title,
-      uniqid: Date.now()
-    })
+function copyContent(options) {
+  return fs.cp(
+    path.join(__dirname, '../src/static'),
+    path.join(options.outDir, 'static'),
+    {
+      recursive: true,
+    },
   );
 }
 
-async function addVisualizer(outDir, options) {
-  const page = makeVisualizerPage({
-    cdn: options.visualizerCDN,
-    fallbackVersion: options.visualizerFallbackVersion,
+async function copyBootstrap(options) {
+  const bootstrapCss = fileURLToPath(
+    import.meta.resolve('bootstrap/dist/css/bootstrap.min.css'),
+  );
+  await fs.mkdir(path.join(options.outDir, 'static'), { recursive: true });
+  return fs.copyFile(
+    bootstrapCss,
+    path.join(options.outDir, 'static/bootstrap.min.css'),
+  );
+}
+
+async function addIndex(options) {
+  const content = await fs.readFile(
+    path.join(__dirname, '../src/template/index.html'),
+    'utf8',
+  );
+  const tpl = _.template(content);
+  return fs.writeFile(
+    path.join(options.outDir, 'index.html'),
+    tpl({
+      title: options.config.title,
+      uniqid: Date.now(),
+    }),
+  );
+}
+
+function addVisualizer(options) {
+  const page = visualizer.makeVisualizerPage({
+    cdn: options.config.visualizerCDN,
+    fallbackVersion: options.config.visualizerFallbackVersion,
     scripts: [
       {
-        url: iframeBridge
-      }
-    ]
+        url: iframeBridge,
+      },
+    ],
   });
-  return fs.writeFile(
-    path.join(outDir, 'visualizer.html'),
-    page,
-  );
+  return fs.writeFile(path.join(options.outDir, 'visualizer.html'), page);
 }

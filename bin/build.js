@@ -1,34 +1,39 @@
-#!/bin/env node
+#!/usr/bin/env node
 
 /* eslint-disable no-console */
 
-'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
 
-const path = require('path');
-const fs = require('fs');
+import minimist from 'minimist';
 
-const yaml = require('js-yaml');
-const argv = require('minimist')(process.argv.slice(2));
+import build from '../main/index.js';
 
-const build = require('..');
+const argv = minimist(process.argv.slice(2));
 
-const options = {};
-if (argv.watch) options.watch = argv.watch;
-if (argv.outDir) options.outDir = argv.outDir;
-if (argv.debug) options.debug = argv.debug;
-
-if (argv.config) {
-  const configFile = path.resolve(path.join(__dirname, '..'), argv.config);
-  options.config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'), {
-    filename: configFile
-  });
+if (!argv.outDir) {
+  console.log(`CLI args:
+    --outDir - output directory (required)
+    --dev - development mode with file watching
+    --config - path to JSON config file
+  `);
+  throw new Error('The --outDir option is required.');
 }
 
-build(options)
-  .then(function () {
-    console.log('Build succeeded');
-  })
-  .catch(function (e) {
-    console.log(e.message, e.stack);
-    console.error('Build failed');
-  });
+const mode = argv.dev ? 'development' : 'production';
+const watch = !!argv.dev;
+const outDir = argv.outDir;
+let config = {};
+if (argv.config) {
+  const configFile = path.resolve(argv.config);
+  config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+}
+
+const cleanup = await build({ mode, watch, outDir, config });
+
+process.on('SIGINT', async () => {
+  console.log('Build cancelled on SIGINT');
+  cleanup().catch(console.error);
+  process.exit(1);
+});

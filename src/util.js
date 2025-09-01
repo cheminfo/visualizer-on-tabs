@@ -1,6 +1,6 @@
 export function rewriteURL(rewriteRules, url) {
   for (let i = 0; i < rewriteRules.length; i++) {
-    var rewriteRule = rewriteRules[i];
+    let rewriteRule = rewriteRules[i];
     if (Array.isArray(rewriteRule)) {
       let tmpUrl = url;
       for (let j = 0; j < rewriteRule.length; j++) {

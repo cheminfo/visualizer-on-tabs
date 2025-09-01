@@ -1,73 +1,72 @@
 import React from 'react';
-import superagent from 'superagent';
-
-const conf = require('../config/config.js');
 
 const styles = {
   position: 'fixed',
   right: 20,
-  top: 10
+  top: 10,
 };
 
 class Login extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    const { config } = props;
     this.state = {};
     this.logout = this.logout.bind(this);
-    if (!conf.rocLogin) return;
+    if (!config.rocLogin) return;
 
-    if (conf.rocLogin.urlAbsolute) {
-      this.loginUrl = conf.rocLogin.urlAbsolute;
+    if (config.rocLogin.urlAbsolute) {
+      this.loginUrl = config.rocLogin.urlAbsolute;
     } else {
-      this.loginUrl = `${conf.rocLogin.url}/auth/login?continue=${conf.rocLogin
-        .redirect || location.href}`;
+      this.loginUrl = `${config.rocLogin.url}/auth/login?continue=${
+        config.rocLogin.redirect || window.location.href
+      }`;
     }
-    this.session();
   }
 
-  session() {
-    if (!conf.rocLogin) return;
-    const login = conf.rocLogin;
-    superagent
-      .get(`${login.url}/auth/session`)
-      .withCredentials()
-      .end((err, res) => {
-        if (err) {
-          throw err;
-        } else if (res && res.status === 200 && res.body) {
-          if (
-            login.auto &&
-            (!res.body.authenticated ||
-              (login.user && res.body.username !== login.user))
-          ) {
-            location.href = this.loginUrl;
-          }
-          this.setState({
-            user: res.body.username
-          });
-          return;
-        }
-        this.setState({
-          user: null
-        });
-      });
+  componentDidMount() {
+    void this.session();
   }
 
-  logout() {
-    if (!conf.rocLogin) return;
-    superagent
-      .get(`${conf.rocLogin.url}/auth/logout`)
-      .withCredentials()
-      .end((err, res) => {
-        if (err) throw err;
-        if (res && res.status === 200) {
-          this.session();
-        }
+  async session() {
+    if (!this.props.config.rocLogin) return;
+    const login = this.props.config.rocLogin;
+    const response = await fetch(`${login.url}/auth/session`, {
+      credentials: 'include',
+    });
+    if (response.ok) {
+      const body = await response.json();
+      if (
+        login.auto &&
+        (!body.authenticated || (login.user && body.username !== login.user))
+      ) {
+        window.location.href = this.loginUrl;
+      }
+      this.setState({
+        user: body.username,
       });
+    } else {
+      this.setState({
+        user: null,
+      });
+    }
+  }
+
+  async logout() {
+    if (!this.props.config.rocLogin) return;
+    const response = await fetch(
+      `${this.props.config.rocLogin.url}/auth/logout`,
+      {
+        credentials: 'include',
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`Unexpected logout response: ${response.statusText}`);
+    }
+    void this.session();
   }
 
   render() {
-    if (!conf.rocLogin) {
+    if (!this.props.config.rocLogin) {
       return <div />;
     }
     if (!this.state.user || this.state.user === 'anonymous') {

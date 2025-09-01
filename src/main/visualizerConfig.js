@@ -1,4 +1,3 @@
-
 const config = '../config.json';
 
 const defaultConfig = {};

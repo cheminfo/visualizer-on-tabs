@@ -1,5 +1,9 @@
 {
   "//": "Dev configuration for testing visualizer-on-tabs locally",
+  "title": "Visualizer on tabs (dev)",
+  "rocLogin": {
+    "url": "https://demo.scipeaks.com/roc/"
+  },
   "possibleViews": {
     "Home": {
       "url": "https://couch.cheminfo.org/cheminfo-public/158ef2f0cc85bfc5b4f2d88cff473e83/view.json"
