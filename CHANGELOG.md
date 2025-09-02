@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/cheminfo/visualizer-on-tabs/compare/v1.0.0...v1.0.1) (2025-09-02)
+
+
+### Bug Fixes
+
+* avoid race condition when creating the static directory ([6baf922](https://github.com/cheminfo/visualizer-on-tabs/commit/6baf9223106ad7b3688f720e901b1d1e8bf0d032))
+
 ## 1.0.0 (2025-09-01)
 
 
