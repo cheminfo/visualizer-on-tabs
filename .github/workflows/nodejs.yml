@@ -12,3 +12,4 @@ jobs:
     uses: zakodium/workflows/.github/workflows/nodejs.yml@nodejs-v1
     with:
       upload-coverage: false
+      node-version-matrix: [22, 24]
