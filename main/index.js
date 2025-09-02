@@ -104,10 +104,11 @@ export default async (options) => {
 
   const confPath = path.join(__dirname, '../src/config/custom.json');
   console.log('Copying files');
+
+  await copyBootstrap(options);
+  await copyContent(options);
   await Promise.all([
     fs.writeFile(confPath, JSON.stringify(options.config)),
-    copyBootstrap(options),
-    copyContent(options),
     addIndex(options),
     addVisualizer(options),
   ]);
