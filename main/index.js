@@ -12,10 +12,6 @@ import iframeBridge from './iframe-bridge.js';
 
 const __dirname = import.meta.dirname;
 
-const defaultConfig = {
-  title: 'visualizer-on-tabs',
-};
-
 async function buildApp(options, outDir, cleanup) {
   const { promise, resolve, reject } = Promise.withResolvers();
   const entries = [{ file: 'app.js' }];
@@ -97,8 +93,6 @@ async function buildApp(options, outDir, cleanup) {
 }
 
 export default async (options) => {
-  Object.assign(options.config, defaultConfig);
-
   const outDir = path.resolve(options.outDir);
   await fs.mkdir(outDir, { recursive: true });
 
@@ -155,7 +149,7 @@ async function addIndex(options) {
   return fs.writeFile(
     path.join(options.outDir, 'index.html'),
     tpl({
-      title: options.config.title,
+      title: options.config.title || 'visualizer-on-tabs',
       uniqid: Date.now(),
     }),
   );
