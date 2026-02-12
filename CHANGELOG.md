@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/cheminfo/visualizer-on-tabs/compare/v1.0.1...v1.0.2) (2026-02-12)
+
+
+### Bug Fixes
+
+* don't override title with default title ([f2c6b9f](https://github.com/cheminfo/visualizer-on-tabs/commit/f2c6b9f4c0e266fa99174168bb6168abca668190))
+
 ## [1.0.1](https://github.com/cheminfo/visualizer-on-tabs/compare/v1.0.0...v1.0.1) (2025-09-02)
 
 
