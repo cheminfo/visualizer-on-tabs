@@ -17,9 +17,9 @@ class Login extends React.Component {
     if (config.rocLogin.urlAbsolute) {
       this.loginUrl = config.rocLogin.urlAbsolute;
     } else {
-      this.loginUrl = `${config.rocLogin.url}/auth/login?continue=${
-        config.rocLogin.redirect || window.location.href
-      }`;
+      this.loginUrl = `${config.rocLogin.url}/auth/login?continue=${encodeURIComponent(
+        config.rocLogin.redirect || window.location.href,
+      )}`;
     }
   }
 
