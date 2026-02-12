@@ -28,26 +28,26 @@
     "test-only": "node --test"
   },
   "dependencies": {
-    "@babel/core": "^7.28.3",
-    "@babel/preset-env": "^7.28.3",
-    "@babel/preset-react": "^7.27.1",
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
+    "@babel/preset-react": "^7.28.5",
     "babel-loader": "^10.0.0",
-    "bootstrap": "^5.3.3",
+    "bootstrap": "^5.3.8",
     "iframe-bridge": "^3.0.2",
     "lockr": "^0.8.5",
-    "lodash": "^4.17.21",
-    "minimist": "^1.2.6",
+    "lodash": "^4.17.23",
+    "minimist": "^1.2.8",
     "react": "^18.3.1",
     "react-bootstrap": "^3.0.0-beta.3",
     "react-dom": "^18.3.1",
     "react-visualizer": "^3.0.1",
-    "webpack": "^5.91.0"
+    "webpack": "^5.105.1"
   },
   "devDependencies": {
-    "eslint": "^9.34.0",
-    "eslint-config-zakodium": "^16.0.0",
-    "prettier": "^3.6.2",
-    "rimraf": "^6.0.1"
+    "eslint": "^9.39.2",
+    "eslint-config-zakodium": "^19.1.0",
+    "prettier": "^3.8.1",
+    "rimraf": "^6.1.2"
   },
   "volta": {
     "node": "24.7.0"
