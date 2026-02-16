@@ -5,12 +5,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
-
-import minimist from 'minimist';
+import { parseArgs } from 'node:util';
 
 import build from '../main/index.js';
 
-const argv = minimist(process.argv.slice(2));
+const { values: argv } = parseArgs({
+  options: {
+    outDir: { type: 'string', short: 'o' },
+    dev: { type: 'boolean', short: 'D' },
+    config: { type: 'string', short: 'c' },
+  },
+});
 
 if (!argv.outDir) {
   console.log(`CLI args:
