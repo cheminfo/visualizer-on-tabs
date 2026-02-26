@@ -102,7 +102,7 @@ export default async (options) => {
   await copyBootstrap(options);
   await copyContent(options);
   await Promise.all([
-    fs.writeFile(confPath, JSON.stringify(options.config)),
+    fs.writeFile(confPath, JSON.stringify(options.config ?? {})),
     addIndex(options),
     addVisualizer(options),
   ]);
@@ -156,13 +156,16 @@ async function addIndex(options) {
 }
 
 function addVisualizer(options) {
+  const customScripts = options.config.visualizer?.scripts || [];
   const page = visualizer.makeVisualizerPage({
-    cdn: options.config.visualizerCDN,
-    fallbackVersion: options.config.visualizerFallbackVersion,
+    // By default we choose the safest option
+    loadversion: 'exact',
+    ...options.config.visualizer,
     scripts: [
       {
         url: iframeBridge,
       },
+      ...customScripts,
     ],
   });
   return fs.writeFile(path.join(options.outDir, 'visualizer.html'), page);

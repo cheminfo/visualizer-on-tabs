@@ -1,5 +1,5 @@
 export default {
-  visualizerConfig: {
+  config: {
     debugLevel: 0,
     filters: [],
     modules: {

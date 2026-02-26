@@ -16,6 +16,13 @@ Example: https://github.com/cheminfo/cheminfo-server-setup/blob/master/doc/on-ta
 const config = {
   // Title of the single page app
   title: 'My app',
+  // Roc login configuration. Don't set or set to false to disable login
+  rocLogin: {
+    // URL of the rest-on-couch server
+    url: 'https://demo.scipeaks.com/roc',
+    // Redirect after login
+    redirect: 'https://demo.scipeaks.com/',
+  },
   // List of default views to load
   possibleViews: {
     Home: {
@@ -42,15 +49,22 @@ const config = {
   // lead to layout issues. Especially in Firefox.
   // When false, only the selected tab is loaded.
   loadHidden: false,
-  // The visualizer configuration object that will be passed to each visualizer instance
-  visualizerConfig: undefined,
-  // The version of the visualizer to load. By default it 'auto', which uses
-  // the version stored in the loaded view.
-  visualizerVersion: 'auto',
-  // Options passed to `makeVisualizerPage`, see https://github.com/cheminfo/react-visualizer
-  // Respectively `fallbackVersion` and `cdn`.
-  visualizerFallbackVersion: undefined,
-  visualizerCDN: undefined,
+
+  // Options related to https://github.com/cheminfo/react-visualizer
+  visualizer: {
+    /**
+     * Options to generate the visualizer html page
+     */
+    loadversion: 'exact',
+    fallbackVersion: 'latest',
+    cdn: 'https://www.lactame.com/visualizer',
+
+    /*
+     * Props passed to the visualizer component
+     */
+    // Visualizer config.json
+    config: undefined,
+  },
 };
 ```
 
