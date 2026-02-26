@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/cheminfo/visualizer-on-tabs/compare/v2.0.0...v2.0.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* pass visualizer config via makeVisualizerPage ([66ab619](https://github.com/cheminfo/visualizer-on-tabs/commit/66ab6192afbf80d71ada037b946bb7864ab334f0))
+
 ## [2.0.0](https://github.com/cheminfo/visualizer-on-tabs/compare/v1.0.2...v2.0.0) (2026-02-26)
 
 
