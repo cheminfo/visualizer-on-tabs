@@ -52,20 +52,15 @@ const config = {
   // When false, only the selected tab is loaded.
   loadHidden: false,
 
-  // Options related to https://github.com/cheminfo/react-visualizer
+  // Options passed to makeVisualizerPage
+  // See https://github.com/cheminfo/react-visualizer
   visualizer: {
-    /**
-     * Options to generate the visualizer html page
-     */
     loadversion: 'exact',
     fallbackVersion: 'latest',
     cdn: 'https://www.lactame.com/visualizer',
-
-    /*
-     * Props passed to the visualizer component
-     */
-    // Visualizer config.json
-    config: undefined,
+    // Can be a URL string or an object
+    // Example of config object: https://github.com/NPellet/visualizer/blob/master/src/usr/config/default.json
+    config: '',
   },
 };
 ```

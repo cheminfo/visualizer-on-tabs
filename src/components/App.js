@@ -323,7 +323,6 @@ class App extends React.Component {
             <Visualizer
               url="visualizer.html"
               viewURL={view.rewrittenUrl || view.url}
-              config={config.visualizer.config}
               style={iframeStyle}
             />
           );

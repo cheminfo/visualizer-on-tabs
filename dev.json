@@ -22,5 +22,23 @@
       "reg": "^[a-z0-9]+/view.json\\?.*",
       "replace": "https://couch.cheminfo.org/cheminfo-public/$&"
     }
-  ]
+  ],
+  "visualizer": {
+    "config": {
+      "modules": {
+        "folders": ["modules/types"]
+      },
+      "header": {
+        "height": "30px",
+        "elements": [
+          {
+            "type": "versionselector",
+            "label": "Object config",
+            "url": "https://www.lactame.com/visualizer/versions.json",
+            "minVersion": "2.155.0"
+          }
+        ]
+      }
+    }
+  }
 }
