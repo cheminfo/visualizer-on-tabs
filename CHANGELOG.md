@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/cheminfo/visualizer-on-tabs/compare/v1.0.2...v2.0.0) (2026-02-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* build options for the visualizer iframe are grouped under the `visualizer` key and renamed to match the original options. rocLogin.urlAbsolute support removed. Use url + redirect.
+
+### Features
+
+* update react-visualizer ([#64](https://github.com/cheminfo/visualizer-on-tabs/issues/64)) ([c3ad3a2](https://github.com/cheminfo/visualizer-on-tabs/commit/c3ad3a2e40425d89040c08b8c3505d09c679c104))
+
 ## [1.0.2](https://github.com/cheminfo/visualizer-on-tabs/compare/v1.0.1...v1.0.2) (2026-02-12)
 
 
