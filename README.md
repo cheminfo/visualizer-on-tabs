@@ -22,6 +22,8 @@ const config = {
     url: 'https://demo.scipeaks.com/roc',
     // Redirect after login
     redirect: 'https://demo.scipeaks.com/',
+    // If true, automatically redirects to the login page if not logged in
+    auto: true,
   },
   // List of default views to load
   possibleViews: {

@@ -24,16 +24,17 @@ class Login extends React.Component {
   }
 
   async session() {
-    if (!this.props.config.rocLogin) return;
-    const login = this.props.config.rocLogin;
-    const response = await fetch(`${login.url}/auth/session`, {
+    const rocLogin = this.props.config.rocLogin;
+    if (!rocLogin) return;
+    const response = await fetch(`${rocLogin.url}/auth/session`, {
       credentials: 'include',
     });
     if (response.ok) {
       const body = await response.json();
       if (
-        login.auto &&
-        (!body.authenticated || (login.user && body.username !== login.user))
+        rocLogin.auto &&
+        (!body.authenticated ||
+          (rocLogin.user && body.username !== rocLogin.user))
       ) {
         window.location.href = this.loginUrl;
       }
