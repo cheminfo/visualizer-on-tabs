@@ -323,10 +323,7 @@ class App extends React.Component {
             <Visualizer
               url="visualizer.html"
               viewURL={view.rewrittenUrl || view.url}
-              version={
-                this.visualizerVersion || config.visualizerVersion || 'auto'
-              }
-              config={config.visualizerConfig}
+              config={config.visualizer.config}
               style={iframeStyle}
             />
           );
