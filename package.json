@@ -39,7 +39,7 @@
     "react": "^18.3.1",
     "react-bootstrap": "^3.0.0-beta.3",
     "react-dom": "^18.3.1",
-    "react-visualizer": "^5.3.0",
+    "react-visualizer": "^5.4.0",
     "webpack": "^5.105.2"
   },
   "devDependencies": {

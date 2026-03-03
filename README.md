@@ -56,6 +56,7 @@ const config = {
   // See https://github.com/cheminfo/react-visualizer
   visualizer: {
     loadversion: 'exact',
+    queryType: 'query', // 'fragment' or 'query'
     fallbackVersion: 'latest',
     cdn: 'https://www.lactame.com/visualizer',
     // Can be a URL string or an object

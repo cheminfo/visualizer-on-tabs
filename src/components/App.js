@@ -323,6 +323,8 @@ class App extends React.Component {
             <Visualizer
               url="visualizer.html"
               viewURL={view.rewrittenUrl || view.url}
+              // The query type passed here should be the same as the one passed to makeVisualizerPage
+              queryType={config.visualizer?.queryType}
               style={iframeStyle}
             />
           );
