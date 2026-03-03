@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/cheminfo/visualizer-on-tabs/compare/v2.0.1...v2.0.2) (2026-03-03)
+
+
+### Bug Fixes
+
+* pass query options to the visualize iframe in a way which is compatible with how it was built ([7ba0c2e](https://github.com/cheminfo/visualizer-on-tabs/commit/7ba0c2ec01f00799c7dc37a63080ecdaeff970f8))
+
 ## [2.0.1](https://github.com/cheminfo/visualizer-on-tabs/compare/v2.0.0...v2.0.1) (2026-02-26)
 
 
