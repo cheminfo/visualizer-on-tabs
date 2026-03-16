@@ -1,6 +1,7 @@
+import customConfig from './custom.json' with { type: 'json' };
 import defaultVisualizerConfig from './visualizer.js';
 
-export function getConfig(customConfig) {
+function getConfig(customConfig) {
   const config = {
     ...customConfig,
     visualizer: {
@@ -14,3 +15,5 @@ export function getConfig(customConfig) {
   }
   return config;
 }
+
+export default getConfig(customConfig);
