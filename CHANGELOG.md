@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/cheminfo/visualizer-on-tabs/compare/v2.0.2...v2.1.0) (2026-03-16)
+
+
+### Features
+
+* add localstorage namespace option ([#70](https://github.com/cheminfo/visualizer-on-tabs/issues/70)) ([2a3eeca](https://github.com/cheminfo/visualizer-on-tabs/commit/2a3eeca2559f08f763af40c4219cefb3c6630abc))
+
 ## [2.0.2](https://github.com/cheminfo/visualizer-on-tabs/compare/v2.0.1...v2.0.2) (2026-03-03)
 
 
