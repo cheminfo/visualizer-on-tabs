@@ -31,7 +31,7 @@
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
     "@babel/preset-react": "^7.28.5",
-    "babel-loader": "^10.0.0",
+    "babel-loader": "^10.1.1",
     "bootstrap": "^5.3.8",
     "iframe-bridge": "^3.0.2",
     "lockr": "^0.8.5",
@@ -40,7 +40,7 @@
     "react-bootstrap": "^3.0.0-beta.3",
     "react-dom": "^18.3.1",
     "react-visualizer": "^5.4.0",
-    "webpack": "^5.105.2"
+    "webpack": "^5.105.4"
   },
   "devDependencies": {
     "eslint": "^9.39.2",
