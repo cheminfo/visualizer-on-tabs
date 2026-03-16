@@ -16,6 +16,9 @@ Example: https://github.com/cheminfo/cheminfo-server-setup/blob/master/doc/on-ta
 const config = {
   // Title of the single page app
   title: 'My app',
+  // Key used to store open tabs and other information in localStorage.
+  // If you have multiple instances of visualizer-on-tabs on the same domain, use this to have separate namespaces in local storage.
+  storageNamespace: 'prefix-key',
   // Roc login configuration. Don't set or set to false to disable login
   rocLogin: {
     // URL of the rest-on-couch server
