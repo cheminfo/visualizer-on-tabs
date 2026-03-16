@@ -1,6 +1,7 @@
 {
   "//": "Dev configuration for testing visualizer-on-tabs locally",
   "title": "Visualizer on tabs (dev)",
+  "storageNamespace": "on-tabs-dev",
   "rocLogin": {
     "url": "https://demo.scipeaks.com/roc/"
   },

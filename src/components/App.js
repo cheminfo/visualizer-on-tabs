@@ -6,8 +6,7 @@ import Tab from 'react-bootstrap/Tab';
 import BTabs from 'react-bootstrap/Tabs';
 import { Visualizer } from 'react-visualizer';
 
-import { getConfig } from '../config/config.js';
-import customConfig from '../config/custom.json' with { type: 'json' };
+import config from '../config/config.js';
 import Tabs from '../main/Tabs.js';
 import iframeMessageHandler from '../main/iframeMessageHandler.js';
 import * as tabStorage from '../main/tabStorage.js';
@@ -16,7 +15,6 @@ import { rewriteURL } from '../util.js';
 import Login from './Login.js';
 import TabTitle from './TabTitle.js';
 
-const config = getConfig(customConfig);
 let tabInit = Promise.resolve();
 let currentIframe;
 

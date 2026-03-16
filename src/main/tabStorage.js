@@ -1,10 +1,15 @@
 import lockr from 'lockr';
 
+import config from '../config/config.js';
+
 import { version } from './constants.js';
 
-const LOCAL_STORAGE_TAB_DATA = 'vweb-';
-const LOCAL_STORAGE_TAB_IDS = 'vweb1-tab-ids';
-const LOCAL_STORAGE_LAST_TAB = 'vweb1-selected-tab';
+const storageNamespace = config.storageNamespace
+  ? `${config.storageNamespace}/`
+  : '';
+const LOCAL_STORAGE_TAB_DATA = `${storageNamespace}vweb-`;
+const LOCAL_STORAGE_TAB_IDS = `${storageNamespace}vweb1-tab-ids`;
+const LOCAL_STORAGE_LAST_TAB = `${storageNamespace}vweb1-selected-tab`;
 
 const storage = {};
 
